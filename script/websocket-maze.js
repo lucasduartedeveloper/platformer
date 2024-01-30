@@ -194,14 +194,18 @@ $(document).ready(function() {
 var websocketBot = {
     messageRequested: false,
     lastUpdate: 0,
+    updateActiveMap: function() {
+        ws.send("PAPER|"+playerId+"|map-response|"+
+        JSON.stringify(maze));
+    },
     requestActiveMap: function() {
         ws.send("PAPER|"+playerId+"|map-request");
     },
     sendPosition: function(value) {
         var obj = {
             timestamp: new Date().getTime(),
-            x: position.x,
-            y: position.y
+            pos: position,
+            path: path
         };
         ws.send("PAPER|"+playerId+"|position-data|"+
         JSON.stringify(obj));
@@ -221,7 +225,8 @@ var websocketBot = {
 
                 if (obj.timestamp < this.lastUpdate) return;
 
-                position = obj;
+                position = obj.pos;
+                path = obj.path;
 
                 this.lastUpdate = currentTime;
                 //obj.timestamp;
@@ -263,6 +268,8 @@ var checkMove = function(step_x, step_y) {
     if (step_x == Math.floor((mazeSize/2)) &&
     step_y == 0)  {
         createMap();
+        websocketBot.sendPosition();
+        websocketBot.updateActiveMap();
         return true;
     }
 
@@ -286,14 +293,20 @@ var checkMove = function(step_x, step_y) {
     if (obj1.right == 1 && step_x < x) hitWall = true;
     if (obj1.down == 1 && step_y < y) hitWall = true;
 
+    if (!hitWall) {
+        path.push({ x: step_x, y: step_y });
+    }
+
     return hitWall;
 };
 
+var path = [];
 var position = { x: Math.floor((mazeSize/2)), y: (mazeSize-1) };
 var mazeSize = 11;
 
-var maze = [];
+var path = [];
 var createMap = function() {
+    path = [];
     maze = [];
     for (var y = 0; y < (mazeSize); y++) {
     for (var x = 0; x < (mazeSize); x++) {
@@ -336,6 +349,8 @@ var createMap = function() {
     var y = (mazeSize-1);
     var step_x = Math.floor((mazeSize/2));
     var step_y = (mazeSize-1);
+
+    path.push({ x: x, y: y });
 
     //setInterval(function() {
     while (step_x != Math.floor((mazeSize/2)) || step_y != 0) {
@@ -444,6 +459,24 @@ var drawImage = function() {
              mapCtx.stroke();
          }
     }
+    }
+
+    mapCtx.lineWidth = 1;
+    mapCtx.strokeStyle = "#5f5";
+
+    mapCtx.beginPath();
+    if (path.length > 0) {
+        mapCtx.moveTo(path[0].x*((sw/2)/mazeSize)+
+        (((sw/2)/mazeSize)/2), 
+        path[0].y*((sw/2)/mazeSize)+
+        (((sw/2)/mazeSize)/2));
+        for (var n = 1; n < path.length; n++) {
+            mapCtx.lineTo(path[n].x*((sw/2)/mazeSize)+
+            (((sw/2)/mazeSize)/2), 
+            path[n].y*((sw/2)/mazeSize)+
+            (((sw/2)/mazeSize)/2));
+        }
+        mapCtx.stroke();
     }
 
     mapCtx.fillStyle = "#5f5";
