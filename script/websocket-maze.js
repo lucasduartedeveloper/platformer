@@ -264,8 +264,23 @@ var checkMove = function(step_x, step_y) {
     step_y == 0) 
     hitWall = false;
 
-    var n = (step_y*mazeSize)+step_x;
-    var obj = maze[n];
+    var { x, y } = position;
+
+    var n0 = (y*mazeSize)+x;
+    var obj0 = maze[n0];
+
+    var n1 = (step_y*mazeSize)+step_x;
+    var obj1 = maze[n1];
+
+    if (obj0.left == 1 && step_x < x) hitWall = true;
+    if (obj0.top == 1 && step_y < y) hitWall = true;
+    if (obj0.right == 1 && step_x > x) hitWall = true;
+    if (obj0.down == 1 && step_y > y) hitWall = true;
+
+    if (obj1.left == 1 && step_x > x) hitWall = true;
+    if (obj1.top == 1 && step_y > y) hitWall = true;
+    if (obj1.right == 1 && step_x < x) hitWall = true;
+    if (obj1.down == 1 && step_y < y) hitWall = true;
 
     return hitWall;
 };
