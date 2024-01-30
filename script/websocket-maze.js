@@ -53,7 +53,7 @@ $(document).ready(function() {
     pictureView.width = (sw/2);
     pictureView.height = (sw/2); 
     pictureView.style.left = ((sw/2)-(sw/4))+"px";
-    pictureView.style.top = (((sh/2)-(sw/2))-10)+"px";
+    pictureView.style.top = (((sh/2)-(sw/2))-5)+"px";
     pictureView.style.width = (sw/2)+"px";
     pictureView.style.height = (sw/2)+"px";
     //pictureView.style.border = "1px solid #fff";
@@ -65,7 +65,7 @@ $(document).ready(function() {
     mapView.width = (sw/2);
     mapView.height = (sw/2); 
     mapView.style.left = ((sw/2)-(sw/4))+"px";
-    mapView.style.top = ((sh/2)+10)+"px";
+    mapView.style.top = ((sh/2)+5)+"px";
     mapView.style.width = (sw/2)+"px";
     mapView.style.height = (sw/2)+"px";
     mapView.style.zIndex = "15";
@@ -184,12 +184,39 @@ $(document).ready(function() {
         };
     };
 
+    helmetArr = [];
+    for (var n = 0; n < 5; n++) {
+        var helmetView = document.createElement("div");
+        helmetView.style.position = "absolute";
+        helmetView.style.background = colorArr[n];
+        helmetView.style.left = ((sw/2)-(sw/4)-7.5)+"px";
+        helmetView.style.top = ((sh/2)+(sw/2)+5-7.5-(n*10))+"px";
+        helmetView.style.width = (5)+"px";
+        helmetView.style.height = (5)+"px";
+        helmetView.style.borderRadius = "50%";
+        helmetView.style.zIndex = "15"
+        document.body.appendChild(helmetView);
+
+        helmetArr.push(helmetView);
+    }
+
+    setHelmet(0);
+
     websocketBot.attachMessageHandler();
     createMap();
 
     drawImage();
     animate();
 });
+
+setHelmet = function(no) {
+    for (var n = 0; n < 5; n++) {
+        helmetArr[n].style.display = "initial";
+    }
+
+    helmetArr[no].style.display = "none";
+    helmet = no;
+};
 
 var websocketBot = {
     messageRequested: false,
@@ -226,7 +253,7 @@ var websocketBot = {
 
                 if (obj.timestamp < this.lastUpdate) return;
 
-                helmet = obj.helmet;
+                setHelmet(obj.helmet);
                 position = obj.pos;
                 path = obj.path;
 
@@ -394,8 +421,10 @@ var createMap = function(switchHelmet=false) {
     position.x = Math.floor((mazeSize/2));
     position.y = (mazeSize-1);
 
-    if (switchHelmet)
-    helmet = (helmet+1) < 5 ? (helmet+1) : 0;
+    if (switchHelmet) {
+        var no = (helmet+1) < 5 ? (helmet+1) : 0;
+        setHelmet(no);
+    }
 
     mapView.style.display = "initial";
 };
