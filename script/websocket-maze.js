@@ -595,7 +595,8 @@ var createMap = function(switchHelmet=false) {
         }
     }
 
-    loadMaze(1);
+    var rnd = Math.floor(Math.random()*3);
+    if (rnd == 0) loadMaze(1);
 
     position.x = Math.floor((mazeSize/2));
     position.y = (mazeSize-1);
