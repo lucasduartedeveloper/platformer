@@ -251,6 +251,31 @@ $(document).ready(function() {
 
     setHelmet(0);
 
+    /*
+    oscillator = createOscillator();
+    oscillator.frequency.value = 100;
+
+    var exit_x = Math.floor((mazeSize/2));
+    var exit_y = 0;
+
+    var far_x = 0;
+    var far_y = (mazeSize-1);
+
+    var co = Math.abs(far_x-exit_x);
+    var ca = Math.abs(far_y-exit_y);
+    var far = Math.sqrt(
+    Math.pow(co, 2)+
+    Math.pow(ca, 2));
+
+    var co = Math.abs(step_x-exit_x);
+    var ca = Math.abs(step_y-exit_y);
+    var hyp = Math.sqrt(
+    Math.pow(co, 2)+
+    Math.pow(ca, 2));
+
+    var distance = 1-((1/far)*hyp);
+    oscillator.frequency.value = 100+(distance*400);*/
+
     websocketBot.attachMessageHandler();
     createMap();
 
@@ -340,8 +365,6 @@ var loadMaze = function(no) {
     for (var x = 0; x < (mazeSize); x++) {
         var num = mazeData[y][x];
         var line = num;
-
-        console.log(y, x, num, line);
 
         var obj = {
             left: parseInt(line[0]),
