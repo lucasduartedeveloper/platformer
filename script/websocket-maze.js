@@ -229,6 +229,12 @@ var websocketBot = {
             else if (msg[0] == "PAPER" &&
                 msg[1] != playerId &&
                 msg[2] == "map-request") {
+                pictureView.style.display = "none";
+                buttonLeftView.style.display = "none";
+                buttonRightView.style.display = "none";
+                buttonUpView.style.display = "none";
+                buttonDownView.style.display = "none";
+
                 ws.send("PAPER|"+playerId+"|map-response|"+
                 JSON.stringify(maze));
             }
