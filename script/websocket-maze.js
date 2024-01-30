@@ -76,6 +76,27 @@ $(document).ready(function() {
         websocketBot.requestActiveMap();
     };
 
+    hasPart = false;
+    buttonBuildView = document.createElement("button");
+    buttonBuildView.style.position = "absolute";
+    buttonBuildView.style.color = "#000";
+    buttonBuildView.innerText = hasPart ? "has part" : "free";
+    buttonBuildView.style.fontFamily = "Khand";
+    buttonBuildView.style.fontSize = "15px";
+    buttonBuildView.style.left = ((sw/2)-165)+"px";
+    buttonBuildView.style.top = (sh-70)+"px";
+    buttonBuildView.style.width = (75)+"px";
+    buttonBuildView.style.height = (25)+"px";
+    buttonBuildView.style.border = "1px solid white";
+    buttonBuildView.style.borderRadius = "25px";
+    buttonBuildView.style.zIndex = "15";
+    document.body.appendChild(buttonBuildView);
+
+    buttonBuildView.onclick = function() {
+        hasPart = !hasPart;
+        buttonBuildView.innerText = hasPart ? "has part" : "free";
+    };
+
     buttonLeftView = document.createElement("button");
     buttonLeftView.style.position = "absolute";
     buttonLeftView.style.color = "#000";
@@ -96,7 +117,14 @@ $(document).ready(function() {
         var step_y = position.y;
 
         var hitWall = checkMove(step_x, step_y);
-        if (!hitWall) {
+        if (hasPart) {
+            path = [];
+            var { x, y } = position;
+            var n = (y*mazeSize)+x;
+            maze[n].left = maze[n].left ? 0 : 1;
+            websocketBot.updateActiveMap();
+        }
+        else if (!hitWall) {
             position.x = step_x;
             position.y = step_y;
             websocketBot.sendPosition();
@@ -123,7 +151,14 @@ $(document).ready(function() {
         var step_y = position.y;
 
         var hitWall = checkMove(step_x, step_y);
-        if (!hitWall) {
+        if (hasPart) {
+            path = [];
+            var { x, y } = position;
+            var n = (y*mazeSize)+x;
+            maze[n].right = maze[n].right ? 0 : 1;
+            websocketBot.updateActiveMap();
+        }
+        else if (!hitWall) {
             position.x = step_x;
             position.y = step_y;
             websocketBot.sendPosition();
@@ -150,7 +185,14 @@ $(document).ready(function() {
         var step_y = position.y-1;
 
         var hitWall = checkMove(step_x, step_y);
-        if (!hitWall) {
+        if (hasPart) {
+            path = [];
+            var { x, y } = position;
+            var n = (y*mazeSize)+x;
+            maze[n].top = maze[n].top ? 0 : 1;
+            websocketBot.updateActiveMap();
+        }
+        else if (!hitWall) {
             position.x = step_x;
             position.y = step_y;
             websocketBot.sendPosition();
@@ -177,7 +219,14 @@ $(document).ready(function() {
         var step_y = position.y+1;
 
         var hitWall = checkMove(step_x, step_y);
-        if (!hitWall) {
+        if (hasPart) {
+            path = [];
+            var { x, y } = position;
+            var n = (y*mazeSize)+x;
+            maze[n].down = maze[n].down ? 0 : 1;
+            websocketBot.updateActiveMap();
+        }
+        else if (!hitWall) {
             position.x = step_x;
             position.y = step_y;
             websocketBot.sendPosition();
@@ -208,6 +257,112 @@ $(document).ready(function() {
     drawImage();
     animate();
 });
+
+document.addEventListener('keydown', (e) => {
+    const keyName = e.key;
+    switch (e.keyCode) {
+        case 37:
+            buttonLeftView.click();
+            break;
+        case 39:
+            buttonRightView.click();
+            break;
+        case 38:
+            buttonUpView.click();
+            break;
+        case 40:
+            buttonDownView.click();
+            break;
+        case 80:
+            buttonBuildView.click();
+            break;
+    }
+  });
+
+var mazeArr = [
+[
+    [ "1100", "0100", "0100", "0100", "0100", "0000", "0100", "0100", "0100", "0100", "0110" ],
+    [ "1000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0010" ],
+    [ "1000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0010" ],
+    [ "1000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0010" ],
+    [ "1000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0010" ],
+    [ "1000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0010" ],
+    [ "1000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0010" ],
+    [ "1000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0010" ],
+    [ "1000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0010" ],
+    [ "1000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0000", "0010" ],
+    [ "1001", "0001", "0001", "0001", "0001", "0000", "0001", "0001", "0001", "0001", "0011" ]
+],
+[
+    [ "1100", "0100", "0100", "0100", "1100", "0000", "0100", "1100", "0100", "1100", "0111" ],
+    [ "1000", "1000", "0100", "1000", "0000", "1010", "0000", "0011", "0001", "0001", "0011" ],
+    [ "1000", "0100", "0000", "0000", "1000", "1100", "0001", "1000", "0001", "0000", "0010" ],
+    [ "1100", "1100", "0100", "0000", "1000", "1000", "0000", "0000", "0000", "0010", "0010" ],
+    [ "1000", "0000", "1100", "0001", "0001", "0010", "0000", "0101", "0100", "0101", "0011" ],
+    [ "1001", "1100", "0011", "0000", "0000", "0010", "0000", "0010", "0000", "0010", "0010" ],
+    [ "1000", "0011", "0000", "0010", "0000", "0100", "0000", "1000", "0001", "1001", "0010" ],
+    [ "1000", "0000", "0000", "1100", "0000", "0100", "0110", "0000", "1000", "0001", "0011" ],
+    [ "1100", "0100", "0001", "1001", "1100", "0100", "0010", "0010", "0000", "0000", "0010" ],
+    [ "1000", "1000", "0000", "0000", "1000", "1010", "0110", "0000", "0101", "0101", "0010" ],
+    [ "1001", "1101", "0001", "0101", "0001", "1000", "0001", "0011", "0001", "0001", "0011" ]
+]
+];
+
+var toString = function(arr) {
+    var text = "";
+    for (var y = 0; y < (mazeSize); y++) {
+    text += "[ ";
+    for (var x = 0; x < (mazeSize); x++) {
+        var n = (y*mazeSize)+x;
+        var obj = arr[n];
+        obj.toLine = function() {
+            return this.left.toString()+
+            this.top.toString()+
+            this.right.toString()+
+            this.down.toString();
+        }.bind(obj);
+
+        text += "\""+obj.toLine()+(x < (mazeSize-1) ? "\", " : "\"");
+    }
+    text += " ]"+(y < (mazeSize-1) ? ",\n" : "");
+    }
+    return text;
+}
+//toString(maze);
+
+var loadMaze = function(no) {
+    maze = [];
+    var newArr = [];
+    var mazeData = mazeArr[no];
+    console.log(0);
+
+    for (var y = 0; y < (mazeSize); y++) {
+    for (var x = 0; x < (mazeSize); x++) {
+        var num = mazeData[y][x];
+        var line = num;
+
+        console.log(y, x, num, line);
+
+        var obj = {
+            left: parseInt(line[0]),
+            top: parseInt(line[1]),
+            right: parseInt(line[2]),
+            down: parseInt(line[3]),
+            set: function(a, b, c, d) {
+                this.left = a == -1 ? this.left : a;
+                this.top = b == -1 ? this.top : b;
+                this.right = c == -1 ? this.right : c;
+                this.down = d == -1 ? this.down : d;
+            }
+        };
+
+        var n = (y*mazeSize)+x;
+        newArr[n] = obj;
+    }
+    }
+
+    maze = newArr;
+};
 
 setHelmet = function(no) {
     for (var n = 0; n < 5; n++) {
@@ -384,7 +539,6 @@ var createMap = function(switchHelmet=false) {
 
     path.push({ x: x, y: y });
 
-    //setInterval(function() {
     while (step_x != Math.floor((mazeSize/2)) || step_y != 0) {
         var rnd = Math.floor(Math.random()*2);
         step_x = x + (rnd == 0 ? 
@@ -417,6 +571,8 @@ var createMap = function(switchHelmet=false) {
             obj.set(0, 0, 0, 0);
         }
     }
+
+    loadMaze(1);
 
     position.x = Math.floor((mazeSize/2));
     position.y = (mazeSize-1);
