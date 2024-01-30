@@ -257,8 +257,10 @@ var checkMove = function(step_x, step_y) {
     if (step_y > (mazeSize-1)) hitWall = true;
 
     if (step_x == Math.floor((mazeSize/2)) &&
-    step_y == (mazeSize-1)) 
-    hitWall = false;
+    step_y == (mazeSize-1)) {
+        createMap();
+        return;
+    }
 
     if (step_x == Math.floor((mazeSize/2)) &&
     step_y == 0) 
@@ -370,7 +372,7 @@ var createMap = function() {
     position.x = Math.floor((mazeSize/2));
     position.y = (mazeSize-1);
 
-    console.log(maze);
+    mapView.style.display = "initial";
 };
 
 var updateImage = true;
