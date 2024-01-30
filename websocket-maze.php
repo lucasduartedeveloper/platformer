@@ -24,8 +24,7 @@ $thirdpart_script = [
 $script = [
     0 => "script/audio-helper.js",
     1 => "script/math-helper.js",
-    2 => "script/platformer_map.js",
-    3 => "script/platformer.js"
+    2 => "script/websocket-maze.js"
 ];
 
 $module = [];

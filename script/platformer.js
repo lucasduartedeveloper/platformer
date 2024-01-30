@@ -183,48 +183,13 @@ $(document).ready(function() {
         isAttacking = true;
 
         sfxPool.play("audio/weapon-sfx-0.wav");
-
-        var position = { ...body0.position };
-
-        Body.setPosition(body0_weapon, {
-            x: position.x,
-            y: position.y+(25/4)-(25)
+        Body.applyForce(body0_weapon1, 
+            body0_weapon1.position, {
+            x: (sprite0.direction == 1 ? -1 : 1),
+            y: 0
         });
-        Body.setAngle(body0_weapon, 0);
 
-        Composite.add(engine.world, [ body0_weapon ]);
-
-        var attackFrame = 0;
-        attackInterval = setInterval(function() {
-            var position = { ...body0.position };
-            var c = {
-                x: position.x,
-                y: position.y+(25/4)
-            };
-            var p = {
-                x: c.x,
-                y: c.y-25
-            };
-
-            var ac = Math.curve((attackFrame/10), 10);
-
-            var a = sprite0.direction == 2 ? -90 : 90;
-            var rp = _rotate2d(c, p, (ac*(a/10)));
-
-            Body.setPosition(body0_weapon, {
-                x: rp.x,
-                y: rp.y
-            });
-            Body.setAngle(body0_weapon, 
-            ac*((-a*(Math.PI/180))/10));
-
-            attackFrame += 1;
-            if (attackFrame > 10) {
-                clearInterval(attackInterval);
-                isAttacking = false;
-                Composite.remove(engine.world, [ body0_weapon ]);
-            };
-        }, 1000/10);
+        isAttacking = false;
     };
 
     drawImage();
@@ -252,7 +217,8 @@ var img_list = [
     "img/spritesheet-0.png",
     "img/spritesheet-1.png",
     "img/spritesheet-2.png",
-    "img/weapon-0.png"
+    "img/weapon-0.png",
+    "img/bus-sprite.png"
 ];
 
 var imagesLoaded = false;
@@ -396,15 +362,6 @@ var Body = Matter.Body;
 // create an engine
 var engine = Engine.create();
 
-var door = Bodies.rectangle(
-(sw/2), (sh/2)-35, 
-25, 50,
-{ isSensor: true, isStatic: true,
-    label: "door",
-    render: {
-         fillStyle: "#ccc",
-         strokeStyle: "#ccc" }});
-
 var body0 = Bodies.rectangle(
 (sw/4), sh-((sh/4)*1.5), 25, 25, { 
     label: "body0",
@@ -427,127 +384,16 @@ var body1 = Bodies.rectangle(
          fillStyle: "#fff",
          strokeStyle: "#fff" }});
 
-var table = Bodies.rectangle(
-(sw/2), (sh/2), 
-(sw/2), 20,
-{ isStatic: true,
-    label: "ground",
+var door = Bodies.rectangle(
+(sw/2), (sh/2)-35, 
+25, 50,
+{ isSensor: true, isStatic: true,
+    label: "door",
     render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
+         fillStyle: "#ccc",
+         strokeStyle: "#ccc" }});
 
-var table1 = Bodies.rectangle(
-sw-(sw/4), (sh/2)+((sh/4)/2), 
-(sw/2), 20,
-{ isStatic: true,
-    label: "ground",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var ceiling = Bodies.rectangle(
-(sw/4), -140, 
-(sw/2), 300,
-{ isStatic: true,
-    label: "ceiling",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var ceilingB = Bodies.rectangle(
-(sw-(sw/4)), -140, 
-(sw/2), 300,
-{ isStatic: true,
-    label: "ceiling",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var wallA = Bodies.rectangle(
--140, (sh/4), 300, 
-((sh/2)),
-//-140, (sh/4)-((sw/gridSize)/2), 300, ((sh/2)-(sw/gridSize)),
-{ isStatic: true,
-    label: "wallA",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var wallA_lower = Bodies.rectangle(
--140, sh-((sh/4)), 300, 
-((sh/2)),
-//-140, sh-((sh/4)-((sw/gridSize)/2)), 300, ((sh/2)-(sw/gridSize)),
-{ isStatic: true,
-    label: "wallA",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var wallB = Bodies.rectangle(
-sw+140, (sh/4), 300, ((sh/2)),
-{ isStatic: true,
-    label: "wallB",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var wallB_lower = Bodies.rectangle(
-sw+140, sh-((sh/4)), 300, ((sh/2)),
-{ isStatic: true,
-    label: "wallA",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var ground = Bodies.rectangle(
-(sw/4), sh-(sh/4)+140, 
-(sw/2), 300,
-{ isStatic: true,
-    label: "ground",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var groundB = Bodies.rectangle(
-(sw-(sw/4)), sh-(sh/4)+140, 
-(sw/2), 300,
-{ isStatic: true,
-    label: "ground",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var cornerA = Bodies.rectangle(
--150, (sh+150), 300, 300,
-{ isStatic: true,
-    label: "cornerA",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var cornerB = Bodies.rectangle(
--150, -150, 300, 300,
-{ isStatic: true,
-    label: "cornerB",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var cornerC = Bodies.rectangle(
-(sw+150), -150, 300, 300,
-{ isStatic: true,
-    label: "cornerC",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
-
-var cornerD = Bodies.rectangle(
-(sw+150), (sh+150), 300, 300, 
-{ isStatic: true,
-    label: "cornerD",
-    render: {
-         fillStyle: '#2f2e40',
-         strokeStyle: '#2f2e40' }});
+var room0 = createRoom0();
 
 var bodyArr = [];
 
@@ -574,7 +420,7 @@ var addBody = function(pos, dir) {
      Composite.add(engine.world, [ obj.body ]);
 };
 
-function matterJs() {
+var matterJs = function() {
     // create a renderer
     render = Render.create({
         engine: engine,
@@ -617,6 +463,8 @@ function matterJs() {
     });
 
     Matter.Events.on(engine, "beforeUpdate", function() { 
+        drawText(text, 15, sh-(sh/4)+17.5);
+
         var position = { ...body0.position };
         var velocity = { ...body0.velocity };
 
@@ -646,7 +494,9 @@ function matterJs() {
         Body.setAngle(body0, 0);
 
         body0.render.sprite.texture = 
-        createTexture(0, 0, 0, sprite0.position, sprite0.direction);
+        sprite0.canJump ? 
+        createTexture(0, 0, 0, sprite0.position, sprite0.direction) : 
+        createTexture(0, 0, 0, 1, sprite0.direction);
         //body0.render.sprite.yOffset = 0.75;
 
         Body.setAngle(body1, 0);
@@ -661,9 +511,7 @@ function matterJs() {
 
     // add buildings
     Composite.add(engine.world, 
-    [ door, table, table1, ceiling, wallA, wallB, ground, 
-    ceilingB, wallA_lower, wallB_lower, groundB, 
-    cornerA, cornerB, cornerC, cornerD ]);
+    [ door, ...room0 ]);
 
     // add all of the bodies to the world
     Composite.add(engine.world, [ body0 ]); //, body1 ]);
@@ -693,14 +541,16 @@ function matterJs() {
     Runner.run(runner, engine);
 }
 
+var defaultCategory = 0x0001, // for walls
+    weaponCategory = 0x0002, // circles
+    npcCategory = 0x0004; // yellow 
+
 var createWorld = function() {
     Composite.remove(engine.world, 
     [ body0 ]);
 
     Composite.remove(engine.world, 
-    [ door, table, table1, ceiling, wallA, wallB, ground, 
-    ceilingB, wallA_lower, wallB_lower, groundB, 
-    cornerA, cornerB, cornerC, cornerD ]);
+    [ door, ...room0 ]);
 
     var ground0 = Bodies.rectangle(
     (sw/2), sh-(sh/4)+140, 
@@ -729,6 +579,40 @@ var createWorld = function() {
     render: {
          fillStyle: "#cfb574",
          strokeStyle: "#cfb574" }});
+
+    var c = { 
+        x: (sw*2)+(sw/2),
+        y: sh-(sh/4)+140
+    };
+    var polygon = [
+        { x: c.x-(sw/2), y: c.y+150 },
+        { x: c.x-(sw/2), y: c.y-150 },
+        { x: c.x+(sw/2), y: c.y },
+        { x: c.x+(sw/2), y: c.y+150 }
+    ];
+
+    var ground2 = Bodies.rectangle(
+    c.x, c.y, sw, 300, 
+    { isStatic: true,
+    label: "ground",
+    render: {
+         fillStyle: "#cfb574",
+         strokeStyle: "#cfb574" }});
+
+    var r = (720/411);
+    var scale = (150/720);
+    var height = (150/r);
+    var bus = Bodies.rectangle(
+    (sw*3)-75, sh-(sh/4)-(height/2)-10, sw, 300, 
+    { isStatic: true, isSensor: true,
+    label: "ground",
+    render: {
+         fillStyle: "#cfb574",
+         strokeStyle: "#cfb574" }});
+
+    bus.render.sprite.texture = "img/bus-sprite.png";
+    bus.render.sprite.xScale = scale;
+    bus.render.sprite.yScale = scale;
 
     Body.setPosition(door, {
         x: (sw/4),
@@ -773,6 +657,9 @@ var createWorld = function() {
 
     Matter.Events.off(engine,  "beforeUpdate");
     Matter.Events.on(engine, "beforeUpdate", function() { 
+        if (body0.position.x > (sw*2))
+        drawText("THE END", (sw/2), (sh/4), true);
+
         var position = { ...body0.position };
         var velocity = { ...body0.velocity };
 
@@ -809,7 +696,9 @@ var createWorld = function() {
         Body.setAngle(body0, 0);
 
         body0.render.sprite.texture = 
-        createTexture(0, 0, 0, sprite0.position, sprite0.direction);
+        sprite0.canJump ? 
+        createTexture(0, 0, 0, sprite0.position, sprite0.direction) : 
+        createTexture(0, 0, 0, 1, sprite0.direction);
         //body0.render.sprite.yOffset = 0.75;
 
         Body.setAngle(body1, 0);
@@ -862,15 +751,17 @@ var createWorld = function() {
          strokeStyle: "#997f42" }});
 
     Composite.add(engine.world, 
-    [ pyramid0, door, ground0, ground1 ]);
+    [ pyramid0, door, ground0, ground1, ground2, bus ]);
 
     Composite.add(engine.world, 
     [ body0, body2, body3 ]);
 
-    var body0_weapon1 = Bodies.circle(
+    body0_weapon1 = Bodies.circle(
     (sw/4), sh-((sh/4)*1.5)+(25/4)-25, 5, { 
-    isSensor: true,
+    isSensor: true, 
     label: "body0_weapon",
+    mass: 0,
+    //density: 0,
     render: {
          fillStyle: "#5f5",
          strokeStyle: "#5f5" }});
@@ -886,6 +777,7 @@ var createWorld = function() {
         pointB: { x: 0, y: (25/4) },
         stiffness: 0.1,
         render: {
+            //anchors: false,
             strokeStyle: '#fff',
             lineWidth: 1,
             type: 'line'
@@ -894,6 +786,24 @@ var createWorld = function() {
 
     Composite.add(engine.world, 
     [ body0_weapon1, ...constraints ]);
+};
+
+var text = "SEARCH THE BUS";
+var drawText = function(text, x, y, centered=false) {
+    var ctx = matterJsView.getContext("2d");
+
+    ctx.font = "15px sans serif";
+    ctx.textAlign = centered ? "center" : "left";
+    ctx.textBaseline = "middle";
+
+    var imgData = ctx.getImageData(x, y, 1, 1);
+    var data = imgData.data;
+
+    var brightness = (1/255)*
+    ((data[0]+data[1]+data[2])/3);
+
+    ctx.fillStyle = !centered && brightness < 0.5 ? "#fff" : "#000";
+    ctx.fillText(text, x, y);
 };
 
 var getHeight = function(h) {
