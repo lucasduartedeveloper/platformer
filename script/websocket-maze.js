@@ -71,6 +71,11 @@ $(document).ready(function() {
     mapView.style.zIndex = "15";
     document.body.appendChild(mapView);
 
+    mapView.onclick = function() {
+        mapView.style.display = "none";
+        websocketBot.requestActiveMap();
+    };
+
     buttonLeftView = document.createElement("button");
     buttonLeftView.style.position = "absolute";
     buttonLeftView.style.color = "#000";
@@ -94,6 +99,7 @@ $(document).ready(function() {
         if (!hitWall) {
             position.x = step_x;
             position.y = step_y;
+            websocketBot.sendPosition();
         };
     };
 
@@ -120,6 +126,7 @@ $(document).ready(function() {
         if (!hitWall) {
             position.x = step_x;
             position.y = step_y;
+            websocketBot.sendPosition();
         };
     };
 
@@ -146,6 +153,7 @@ $(document).ready(function() {
         if (!hitWall) {
             position.x = step_x;
             position.y = step_y;
+            websocketBot.sendPosition();
         };
     };
 
@@ -172,14 +180,68 @@ $(document).ready(function() {
         if (!hitWall) {
             position.x = step_x;
             position.y = step_y;
+            websocketBot.sendPosition();
         };
     };
 
+    websocketBot.attachMessageHandler();
     createMap();
 
     drawImage();
     animate();
 });
+
+var websocketBot = {
+    messageRequested: false,
+    lastUpdate: 0,
+    requestActiveMap: function() {
+        ws.send("PAPER|"+playerId+"|map-request");
+    },
+    sendPosition: function(value) {
+        var obj = {
+            timestamp: new Date().getTime(),
+            x: position.x,
+            y: position.y
+        };
+        ws.send("PAPER|"+playerId+"|position-data|"+
+        JSON.stringify(obj));
+        this.messageRequested = false;
+    },
+    attachMessageHandler: function() {
+        ws.onmessage = function(e) {
+            var msg = e.data.split("|");
+            //console.log(msg[2] + " from " + msg[1]);
+
+            if (msg[0] == "PAPER" &&
+                msg[1] != playerId &&
+                msg[2] == "position-data") {
+                var obj = JSON.parse(msg[3]);
+
+                var currentTime = new Date().getTime();
+
+                if (obj.timestamp < this.lastUpdate) return;
+
+                position = obj;
+
+                this.lastUpdate = currentTime;
+                //obj.timestamp;
+            }
+            else if (msg[0] == "PAPER" &&
+                msg[1] != playerId &&
+                msg[2] == "map-request") {
+                ws.send("PAPER|"+playerId+"|map-response|"+
+                JSON.stringify(maze));
+            }
+            else if (msg[0] == "PAPER" &&
+                msg[1] != playerId &&
+                msg[2] == "map-response") {
+                var obj = JSON.parse(msg[3]);
+
+                maze = obj;
+            }
+        }.bind(this);
+    }
+};
 
 var checkMove = function(step_x, step_y) {
     var hitWall = false;
