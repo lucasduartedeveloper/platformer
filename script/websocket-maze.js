@@ -204,6 +204,7 @@ var websocketBot = {
     sendPosition: function(value) {
         var obj = {
             timestamp: new Date().getTime(),
+            helmet: helmet,
             pos: position,
             path: path
         };
@@ -225,6 +226,7 @@ var websocketBot = {
 
                 if (obj.timestamp < this.lastUpdate) return;
 
+                helmet = obj.helmet;
                 position = obj.pos;
                 path = obj.path;
 
@@ -267,7 +269,7 @@ var checkMove = function(step_x, step_y) {
 
     if (step_x == Math.floor((mazeSize/2)) &&
     step_y == 0)  {
-        createMap();
+        createMap(true);
         websocketBot.sendPosition();
         websocketBot.updateActiveMap();
         return true;
@@ -300,12 +302,15 @@ var checkMove = function(step_x, step_y) {
     return hitWall;
 };
 
+var colorArr = [ "#5f5", "orange", "#55f", "#f55", "yellow" ];
+var helmet = 0;
+
 var path = [];
 var position = { x: Math.floor((mazeSize/2)), y: (mazeSize-1) };
 var mazeSize = 11;
 
 var path = [];
-var createMap = function() {
+var createMap = function(switchHelmet=false) {
     path = [];
     maze = [];
     for (var y = 0; y < (mazeSize); y++) {
@@ -389,6 +394,9 @@ var createMap = function() {
     position.x = Math.floor((mazeSize/2));
     position.y = (mazeSize-1);
 
+    if (switchHelmet)
+    helmet = (helmet+1) < 5 ? (helmet+1) : 0;
+
     mapView.style.display = "initial";
 };
 
@@ -462,7 +470,7 @@ var drawImage = function() {
     }
 
     mapCtx.lineWidth = 1;
-    mapCtx.strokeStyle = "#5f5";
+    mapCtx.strokeStyle = colorArr[helmet];
 
     mapCtx.beginPath();
     if (path.length > 0) {
@@ -479,7 +487,7 @@ var drawImage = function() {
         mapCtx.stroke();
     }
 
-    mapCtx.fillStyle = "#5f5";
+    mapCtx.fillStyle = colorArr[helmet];
 
     mapCtx.beginPath();
     mapCtx.arc(position.x*((sw/2)/mazeSize)+
