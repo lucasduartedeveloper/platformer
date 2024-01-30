@@ -257,14 +257,16 @@ var checkMove = function(step_x, step_y) {
     if (step_y > (mazeSize-1)) hitWall = true;
 
     if (step_x == Math.floor((mazeSize/2)) &&
-    step_y == (mazeSize-1)) {
+    step_y == (mazeSize-1))
+    hitWall = true;
+
+    if (step_x == Math.floor((mazeSize/2)) &&
+    step_y == 0)  {
         createMap();
         return;
     }
 
-    if (step_x == Math.floor((mazeSize/2)) &&
-    step_y == 0) 
-    hitWall = false;
+    if (hitWall) return true;
 
     var { x, y } = position;
 
