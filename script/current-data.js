@@ -96,28 +96,95 @@ $(document).ready(function() {
     windVelocityView.style.zIndex = "15";
     document.body.appendChild(windVelocityView);
 
+    previousMapView = document.createElement("canvas");
+    previousMapView.style.position = "absolute";
+    previousMapView.style.imageRendering = "pixelated";
+    previousMapView.style.background = "#fff";
+    previousMapView.style.fontFamily = "Khand";
+    previousMapView.style.fontSize = "15px";
+    previousMapView.style.textAlign = "center";
+    previousMapView.width = (201);
+    previousMapView.height = (201);
+    previousMapView.style.left = ((sw/2)-100)+"px";
+    previousMapView.style.top = ((sh/2)-275)+"px";
+    previousMapView.style.width = (200)+"px";
+    previousMapView.style.height = (200)+"px";
+    //mapView.style.borderRadius = "25px";
+    previousMapView.style.zIndex = "15";
+    document.body.appendChild(previousMapView);
+
     mapView = document.createElement("canvas");
     mapView.style.position = "absolute";
+    mapView.style.imageRendering = "pixelated";
     mapView.style.background = "#fff";
     mapView.style.fontFamily = "Khand";
     mapView.style.fontSize = "15px";
     mapView.style.textAlign = "center";
-    mapView.width = (50);
-    mapView.height = (50);
-    mapView.style.left = ((sw/2)-25)+"px";
-    mapView.style.top = ((sh/2)+50)+"px";
-    mapView.style.width = (50)+"px";
-    mapView.style.height = (50)+"px";
+    mapView.width = previousMapView.width;
+    mapView.height = previousMapView.height;
+    mapView.style.left = previousMapView.style.left;
+    mapView.style.top = previousMapView.style.top;
+    mapView.style.width = previousMapView.style.width;
+    mapView.style.height = previousMapView.style.height;
     //mapView.style.borderRadius = "25px";
     mapView.style.zIndex = "15";
     document.body.appendChild(mapView);
 
+    cameraView = document.createElement("video");
+    cameraView.style.position = "absolute";
+    cameraView.autoplay = true;
+    cameraView.style.objectFit = "cover";
+    cameraView.width = (100);
+    cameraView.height = (100);
+    cameraView.style.left = ((sw/2)-50)+"px";
+    cameraView.style.top = ((sh/2)-175)+"px";
+    cameraView.style.width = (100)+"px";
+    cameraView.style.height = (100)+"px";
+    cameraView.style.zIndex = "15";
+    //document.body.appendChild(cameraView);
+    cameraElem = cameraView;
+
+    deviceNo = 0;
+    mapView.onclick = function() {
+        if (!cameraOn) startCamera();
+        else hasNewData = true;
+    };
+
     websocketBot.attachMessageHandler();
-    getTime();
+    loadImages(function() {
+        drawBaseImage(
+        img_list[0], img_list[0].naturalWidth, img_list[0].naturalHeight);
+    });
 
     drawImage();
     animate();
 });
+
+var img_list = [
+    "img/picture-0.png"
+];
+
+var imagesLoaded = false;
+var loadImages = function(callback) {
+    var count = 0;
+    for (var n = 0; n < img_list.length; n++) {
+        var img = document.createElement("img");
+        img.n = n;
+        img.onload = function() {
+            count += 1;
+            console.log("loading ("+count+"/"+img_list.length+")");
+            img_list[this.n] = this;
+            if (count == img_list.length) {
+                imagesLoaded = true;
+                if (callback) callback();
+            }
+        };
+        var rnd = Math.random();
+        img.src = img_list[n].includes("img") ? 
+        img_list[n]+"?f="+rnd : 
+        img_list[n];
+    }
+};
 
 document.addEventListener('keydown', (e) => {
     const keyName = e.key;
@@ -218,66 +285,108 @@ var animate = function() {
     requestAnimationFrame(animate);
 };
 
+var hasNewData = false;
 var drawImage = function() {
-    var currentTime = new Date(serverTime);
-
-    var hours = currentTime.getHours();
-    var brightness = Math.floor(((1/24)*hours)*255);
-
     var ctx = mapView.getContext("2d");
-    ctx.fillStyle = 
-    "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
+    ctx.imageSmoothingEnabled = false;
 
-    var size = 50;
-    ctx.beginPath();
-    ctx.rect(25-(size/2), 25-(size/2), size, size);
-    ctx.fill();
+    if (cameraOn) {
+        var video = {
+            width: vw,
+            height: vh
+        };
+        var frame = {
+            width: getSquare(video),
+            height: getSquare(video)
+        };
+        var format = fitImageCover(video, frame);
 
-    var minutes = currentTime.getMinutes();
-    var brightness = Math.floor(((1/60)*minutes)*255);
+        ctx.drawImage(cameraView,
+        -format.left, -format.top, frame.width, frame.height, 
+        0, 0, mapView.width, mapView.height);
+    }
 
-    var ctx = mapView.getContext("2d");
-    ctx.fillStyle = 
-    "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
+    if (hasNewData) {
+        drawBaseImage(
+        mapView, mapView.width, mapView.height);
+        hasNewData = false;
+    }
 
-    var size = (50/4)*3;
-    ctx.beginPath();
-    ctx.rect(25-(size/2), 25-(size/2), size, size);
-    ctx.fill();
-
-    var seconds = currentTime.getSeconds();
-    var brightness = Math.floor(((1/60)*seconds)*255);
-
-    var ctx = mapView.getContext("2d");
-    ctx.fillStyle = 
-    "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
-
-    var size = (50/4)*2;
-    ctx.beginPath();
-    ctx.rect(25-(size/2), 25-(size/2), size, size);
-    ctx.fill();
-
-    var ms = currentTime.getMilliseconds();
-    var brightness = Math.floor(((1/1000)*ms)*255);
-
-    var ctx = mapView.getContext("2d");
-    ctx.fillStyle = 
-    "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
-
-    var size = (50/4);
-    ctx.beginPath();
-    ctx.rect(25-(size/2), 25-(size/2), size, size);
-    ctx.fill();
+    if (imagesLoaded) combineImageData();
 };
 
-var getValue = function(x) {
-    var co = Math.abs(0-x);
-    var ca = Math.abs(0-1);
-    var far = Math.sqrt(
-    Math.pow(co, 2)+
-    Math.pow(ca, 2));
+var drawBaseImage = function(image, width, height) {
+    var baseCtx = previousMapView.getContext("2d");
+    baseCtx.imageSmoothingEnabled = false;
 
-    return far;
+    //console.log(image, width, height);
+    baseCtx.clearRect(
+    0, 0, previousMapView.width, previousMapView.height);
+
+    var video = {
+        width: width,
+        height: height
+    };
+    var frame = {
+        width: getSquare(video),
+        height: getSquare(video)
+    };
+    var format = fitImageCover(video, frame);
+
+    baseCtx.drawImage(image,
+    -format.left, -format.top, frame.width, frame.height, 
+    0, 0, previousMapView.width, previousMapView.height);
+};
+
+var hasLog = false;
+var combineImageData = function() {
+    var canvas = mapView;
+    var ctx = canvas.getContext("2d");
+
+    var imgData = 
+    ctx.getImageData(0, 0, 
+    canvas.width, canvas.height);
+    var data = imgData.data;
+
+    var baseCanvas = previousMapView;
+    var baseCtx = baseCanvas.getContext("2d");
+
+    var baseImgData = 
+    baseCtx.getImageData(0, 0, 
+    baseCanvas.width, baseCanvas.height);
+    var baseData = baseImgData.data;
+
+    var newImageArray = 
+    new Uint8ClampedArray(data);
+
+    for (var y = 0; y < canvas.width; y++) {
+    for (var x = 0; x < canvas.height; x++) {
+        var n = ((y*canvas.width)+x)*4;
+
+        newImageArray[n] = (baseData[n]+data[n])/2;
+        newImageArray[n+1] = (baseData[n+1]+data[n+1])/2;
+        newImageArray[n+2] = (baseData[n+2]+data[n+2])/2;
+        newImageArray[n+3] = 255;
+    }
+    }
+
+    if (!hasLog) {
+        //console.log(baseData, newImageArray);
+        hasLog = true;
+    }
+
+    var newImageData = new ImageData(newImageArray, canvas.width, canvas.height);
+
+    ctx.putImageData(newImageData, 0, 0);
+};
+
+var getSquare = function(item) {
+    var width = item.naturalWidth ? 
+    item.naturalWidth : item.width;
+    var height = item.naturalHeight ? 
+    item.naturalHeight : item.height;
+
+    return width < height ? width : height;
 };
 
 var visibilityChange;
