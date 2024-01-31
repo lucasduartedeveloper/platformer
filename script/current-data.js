@@ -96,8 +96,23 @@ $(document).ready(function() {
     windVelocityView.style.zIndex = "15";
     document.body.appendChild(windVelocityView);
 
+    mapView = document.createElement("canvas");
+    mapView.style.position = "absolute";
+    mapView.style.background = "#fff";
+    mapView.style.fontFamily = "Khand";
+    mapView.style.fontSize = "15px";
+    mapView.style.textAlign = "center";
+    mapView.width = (50);
+    mapView.height = (50);
+    mapView.style.left = ((sw/2)-25)+"px";
+    mapView.style.top = ((sh/2)+50)+"px";
+    mapView.style.width = (50)+"px";
+    mapView.style.height = (50)+"px";
+    //mapView.style.borderRadius = "25px";
+    mapView.style.zIndex = "15";
+    document.body.appendChild(mapView);
+
     websocketBot.attachMessageHandler();
-    createMap();
 
     drawImage();
     animate();
@@ -203,7 +218,40 @@ var animate = function() {
 };
 
 var drawImage = function() {
-    
+    var currentTime = new Date();
+
+    var hours = currentTime.getHours();
+    var brightness = Math.floor(((1/24)*hours)*255);
+
+    var ctx = mapView.getContext("2d");
+    ctx.fillStyle = 
+    "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
+
+    ctx.beginPath();
+    ctx.arc(25, 25, 25*Math.sqrt(2), 0, (Math.PI*2));
+    ctx.fill();
+
+    var minutes = currentTime.getMinutes();
+    var brightness = Math.floor(((1/60)*minutes)*255);
+
+    var ctx = mapView.getContext("2d");
+    ctx.fillStyle = 
+    "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
+
+    ctx.beginPath();
+    ctx.arc(25, 25, ((25*Math.sqrt(2))/3)*2, 0, (Math.PI*2));
+    ctx.fill();
+
+    var seconds = currentTime.getSeconds();
+    var brightness = Math.floor(((1/60)*seconds)*255);
+
+    var ctx = mapView.getContext("2d");
+    ctx.fillStyle = 
+    "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
+
+    ctx.beginPath();
+    ctx.arc(25, 25, ((25*Math.sqrt(2))/3), 0, (Math.PI*2));
+    ctx.fill();
 };
 
 var getValue = function(x) {
