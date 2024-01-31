@@ -501,13 +501,19 @@ var checkMove = function(step_x, step_y) {
     if (obj1.down == 1 && step_y < y) hitWall = true;
 
     if (!hitWall) {
-        path.push({ x: step_x, y: step_y });
+        //path.push({ x: step_x, y: step_y });
     }
 
     return hitWall;
 };
 
-var colorArr = [ "#5f5", "orange", "#55f", "#f55", "yellow" ];
+var colorArr = [ 
+    "#5f5", 
+    "orange", 
+    "#55f", 
+    "#f55", 
+    "yellow" 
+];
 var helmet = 0;
 
 var path = [];
@@ -706,6 +712,44 @@ var drawImage = function() {
     0, (Math.PI*2));
     mapCtx.fill();
 
+    mapCtx.lineWidth = 0.5;
+    mapCtx.strokeStyle = colorArr[helmet];
+
+    var start_x = Math.floor((mazeSize/2))*((sw/2)/mazeSize)+
+    (((sw/2)/mazeSize)/2);
+    var start_y = (mazeSize-1)*((sw/2)/mazeSize)+
+    (((sw/2)/mazeSize)/2);
+
+    var far_x = 0+(((sw/2)/mazeSize)/2);
+    var far_y = 0+(((sw/2)/mazeSize)/2);
+
+    var co = Math.abs(far_x-start_x);
+    var ca = Math.abs(far_y-start_y);
+    var far = Math.sqrt(
+    Math.pow(co, 2)+
+    Math.pow(ca, 2));
+
+    //console.log(far);
+
+    for (var n = 0; n < 1; n++) {
+        var c = {
+            x: position.x*((sw/2)/mazeSize)+
+            (((sw/2)/mazeSize)/2),
+            y: position.y*((sw/2)/mazeSize)+
+            (((sw/2)/mazeSize)/2)
+        };
+        var p = {
+            x: c.x,
+            y: c.y-far
+        };
+        var rp = _rotate2d(c, p, n*(360/5));
+
+        mapCtx.beginPath();
+        mapCtx.moveTo(c.x, c.y);
+        mapCtx.lineTo(rp.x, rp.y);
+        mapCtx.stroke();
+    };
+
     var ctx = pictureView.getContext("2d");
     ctx.imageSmoothingEnabled = false;
 
@@ -716,6 +760,16 @@ var drawImage = function() {
     position.y*((sw/2)/mazeSize), 
     ((sw/2)/mazeSize), ((sw/2)/mazeSize),
     0, 0, (sw/2), (sw/2));
+};
+
+var getValue = function(x) {
+    var co = Math.abs(0-x);
+    var ca = Math.abs(0-1);
+    var far = Math.sqrt(
+    Math.pow(co, 2)+
+    Math.pow(ca, 2));
+
+    return far;
 };
 
 var visibilityChange;
