@@ -191,6 +191,38 @@ $(document).ready(function() {
         (previousToNext*100)+"%";
     };
 
+    downloadView = document.createElement("button");
+    downloadView.style.position = "absolute";
+    downloadView.style.background = "#fff";
+    downloadView.style.color = "#000";
+    downloadView.innerText = "download";
+    downloadView.style.fontFamily = "Khand";
+    downloadView.style.lineHeight = (25)+"px";
+    downloadView.style.fontSize = (15)+"px";
+    downloadView.style.left = ((sw/2)+95)+"px";
+    downloadView.style.top = ((sh/2)+50)+"px";
+    downloadView.style.width = (70)+"px";
+    downloadView.style.height = (25)+"px";
+    downloadView.style.border = "none";
+    downloadView.style.borderRadius = "12.5px";
+    downloadView.style.zIndex = "15";
+    document.body.appendChild(downloadView);
+
+    downloadView.onclick = function() {
+        var name = "download.png";
+        var url = mapView.toDataURL();
+        var a = document.createElement('a');
+        a.style.display = "none";
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 100);
+    };
+
     previousMapView = document.createElement("canvas");
     previousMapView.style.position = "absolute";
     previousMapView.style.imageRendering = "pixelated";
