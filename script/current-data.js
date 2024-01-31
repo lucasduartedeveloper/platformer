@@ -113,6 +113,7 @@ $(document).ready(function() {
     document.body.appendChild(mapView);
 
     websocketBot.attachMessageHandler();
+    getTime();
 
     drawImage();
     animate();
@@ -218,7 +219,7 @@ var animate = function() {
 };
 
 var drawImage = function() {
-    var currentTime = new Date();
+    var currentTime = new Date(serverTime);
 
     var hours = currentTime.getHours();
     var brightness = Math.floor(((1/24)*hours)*255);
@@ -227,8 +228,9 @@ var drawImage = function() {
     ctx.fillStyle = 
     "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
 
+    var size = 50;
     ctx.beginPath();
-    ctx.arc(25, 25, 25*Math.sqrt(2), 0, (Math.PI*2));
+    ctx.rect(25-(size/2), 25-(size/2), size, size);
     ctx.fill();
 
     var minutes = currentTime.getMinutes();
@@ -238,8 +240,9 @@ var drawImage = function() {
     ctx.fillStyle = 
     "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
 
+    var size = (50/4)*3;
     ctx.beginPath();
-    ctx.arc(25, 25, ((25*Math.sqrt(2))/3)*2, 0, (Math.PI*2));
+    ctx.rect(25-(size/2), 25-(size/2), size, size);
     ctx.fill();
 
     var seconds = currentTime.getSeconds();
@@ -249,8 +252,21 @@ var drawImage = function() {
     ctx.fillStyle = 
     "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
 
+    var size = (50/4)*2;
     ctx.beginPath();
-    ctx.arc(25, 25, ((25*Math.sqrt(2))/3), 0, (Math.PI*2));
+    ctx.rect(25-(size/2), 25-(size/2), size, size);
+    ctx.fill();
+
+    var ms = currentTime.getMilliseconds();
+    var brightness = Math.floor(((1/1000)*ms)*255);
+
+    var ctx = mapView.getContext("2d");
+    ctx.fillStyle = 
+    "rgb("+(brightness/2)+","+brightness+","+(brightness/2)+")";
+
+    var size = (50/4);
+    ctx.beginPath();
+    ctx.rect(25-(size/2), 25-(size/2), size, size);
     ctx.fill();
 };
 
