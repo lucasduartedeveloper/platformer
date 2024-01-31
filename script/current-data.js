@@ -96,6 +96,101 @@ $(document).ready(function() {
     windVelocityView.style.zIndex = "15";
     document.body.appendChild(windVelocityView);
 
+    maxCount = 1;
+    timerView = document.createElement("span");
+    timerView.style.position = "absolute";
+    timerView.style.color = "#fff";
+    timerView.innerText = "0/"+maxCount;
+    timerView.style.fontFamily = "Khand";
+    timerView.style.fontSize = "25px";
+    timerView.style.textAlign = "center";
+    timerView.style.left = ((sw/2)-25)+"px";
+    timerView.style.top = ((sh/2)+125)+"px";
+    timerView.style.width = (50)+"px";
+    timerView.style.height = (25)+"px";
+    //waterHeightView.style.border = "1px solid white";
+    timerView.style.borderRadius = "25px";
+    timerView.style.zIndex = "15";
+    document.body.appendChild(timerView);
+
+    timerView.onclick = function() {
+        /*
+        var value = prompt("Max count: ", maxCount);
+        value = parseInt(value);
+        if (!value) return;*/
+
+        var value = (maxCount+1);
+
+        maxCount = value;
+        timerView.innerText = "0/"+maxCount;
+    };
+
+    playView = document.createElement("button");
+    playView.style.position = "absolute";
+    playView.style.color = "#000";
+    playView.innerText = "pause";
+    playView.style.fontFamily = "Khand";
+    playView.style.fontSize = "15px";
+    playView.style.textAlign = "center";
+    playView.style.left = ((sw/2)-25)+"px";
+    playView.style.top = ((sh/2)+50)+"px";
+    playView.style.width = (50)+"px";
+    playView.style.height = (25)+"px";
+    //waterHeightView.style.border = "1px solid white";
+    playView.style.borderRadius = "25px";
+    playView.style.zIndex = "15";
+    document.body.appendChild(playView);
+
+    timerInterval = 0;
+    playView.onclick = function() {
+        if (!cameraView.paused) {
+            var count = 0;
+            timerInterval = setInterval(function() {
+                count += 1;
+                timerView.innerText = count+ "/" +maxCount;
+
+                if (count == maxCount) {
+                    clearInterval(timerInterval);
+                    cameraView.pause();
+                    playView.innerText = "play";
+                }
+            }, 1000);
+        }
+        else {
+            clearInterval(timerInterval);
+            var count = 0;
+            timerView.innerText = count+ "/" +maxCount;
+
+            cameraView.play();
+            playView.innerText = "pause";
+        }
+    };
+
+    previousToNext = 0.5;
+    previousToNextView = document.createElement("button");
+    previousToNextView.style.position = "absolute";
+    previousToNextView.style.color = "#000";
+    previousToNextView.innerText = 
+    (previousToNext*100)+"%";
+    previousToNextView.style.fontFamily = "Khand";
+    previousToNextView.style.fontSize = "15px";
+    previousToNextView.style.textAlign = "center";
+    previousToNextView.style.left = ((sw/2)+35)+"px";
+    previousToNextView.style.top = ((sh/2)+50)+"px";
+    previousToNextView.style.width = (50)+"px";
+    previousToNextView.style.height = (25)+"px";
+    //waterHeightView.style.border = "1px solid white";
+    previousToNextView.style.borderRadius = "25px";
+    previousToNextView.style.zIndex = "15";
+    document.body.appendChild(previousToNextView);
+
+    previousToNextView.onclick = function() {
+        previousToNext = (previousToNext+0.25) < 1.25 ? 
+        (previousToNext+0.25) : 0;
+        previousToNextView.innerText = 
+        (previousToNext*100)+"%";
+    };
+
     previousMapView = document.createElement("canvas");
     previousMapView.style.position = "absolute";
     previousMapView.style.imageRendering = "pixelated";
@@ -363,9 +458,15 @@ var combineImageData = function() {
     for (var x = 0; x < canvas.height; x++) {
         var n = ((y*canvas.width)+x)*4;
 
-        newImageArray[n] = (baseData[n]+data[n])/2;
-        newImageArray[n+1] = (baseData[n+1]+data[n+1])/2;
-        newImageArray[n+2] = (baseData[n+2]+data[n+2])/2;
+        var r0 = previousToNext;
+        var r1 = (1-previousToNext);
+
+        newImageArray[n] = 
+        ((r0*baseData[n])+(r1*data[n]));
+        newImageArray[n+1] = 
+        ((r0*baseData[n + 1])+(r1*data[n + 1]));
+        newImageArray[n+2] = 
+        ((r0*baseData[n + 2])+(r1*data[n + 2]));
         newImageArray[n+3] = 255;
     }
     }
