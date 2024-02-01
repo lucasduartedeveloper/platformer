@@ -655,7 +655,7 @@ var drawImage = function() {
     var acc = ((-0.5+((1/mapView.height)*offsetY))+rnd);
     console.log(acc);
 
-    var frequency = 50+(acc*5);
+    var frequency = (50+speedY)+(acc*5);
 
     if (speedY > 0)
     oscillator.frequency.value = frequency;
@@ -667,6 +667,9 @@ var drawImage = function() {
     var tempCtx = tempCanvas.getContext("2d");
 
     tempCtx.filter = "blur("+(speedY/10)+"px)";
+
+    tempCtx.drawImage(mapView, 0, -(mapView.height*2)+offsetY,
+    mapView.width, mapView.height);
 
     tempCtx.drawImage(mapView, 0, -mapView.height+offsetY,
     mapView.width, mapView.height);
