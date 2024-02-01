@@ -367,6 +367,24 @@ $(document).ready(function() {
         }, 100);
     };
 
+    frequencyPath = [];
+    frequencyView = document.createElement("canvas");
+    frequencyView.style.position = "absolute";
+    frequencyView.style.imageRendering = "pixelated";
+    //frequencyView.style.background = "#fff";
+    frequencyView.style.fontFamily = "Khand";
+    frequencyView.style.fontSize = "15px";
+    frequencyView.style.textAlign = "center";
+    frequencyView.width = (sw);
+    frequencyView.height = (50);
+    frequencyView.style.left = (0)+"px";
+    frequencyView.style.top = (0)+"px";
+    frequencyView.style.width = (sw)+"px";
+    frequencyView.style.height = (50)+"px";
+    //mapView.style.borderRadius = "25px";
+    frequencyView.style.zIndex = "15";
+    document.body.appendChild(frequencyView);
+
     previousMapStoreView = document.createElement("canvas");
     previousMapStoreView.style.position = "absolute";
     previousMapStoreView.style.imageRendering = "pixelated";
@@ -655,7 +673,8 @@ var drawImage = function() {
     var acc = ((-0.5+((1/mapView.height)*offsetY))+rnd);
     console.log(acc);
 
-    var frequency = (10+(speedY/2))+(acc*(25-(speedY/8)));
+    var frequency = (50+(speedY/2))+(acc*(10-(speedY/20)));
+    frequencyPath.splice(0, 0, frequency);
 
     if (speedY > 0)
     oscillator.frequency.value = frequency;
@@ -666,7 +685,8 @@ var drawImage = function() {
 
     var tempCtx = tempCanvas.getContext("2d");
 
-    tempCtx.filter = "blur("+(speedY/10)+"px)";
+    tempCtx.filter = speedY < 201 ?
+    "blur("+(speedY/20)+"px)" : "none";
 
     tempCtx.drawImage(mapView, 0, -(mapView.height*2)+offsetY,
     mapView.width, mapView.height);
@@ -681,6 +701,21 @@ var drawImage = function() {
 
     ctx.drawImage(tempCanvas, 0, 0, 
     mapView.width, mapView.height);
+
+    var frequenctCtx = frequencyView.getContext("2d");
+    frequenctCtx.clearRect(0, 0, sw, 50);
+
+    frequenctCtx.lineWidth = 1;
+    frequenctCtx.strokeStyle = "#fff";
+
+    frequenctCtx.beginPath();
+    frequenctCtx.moveTo((sw/2), 
+    25-((-0.5+((1/150)*frequencyPath[0]))*25));
+    for (var n = 1;  n < frequencyPath.length; n++) {
+        frequenctCtx.lineTo((sw/2)-n, 
+        25-((-0.5+((1/150)*frequencyPath[n]))*25));
+    }
+    frequenctCtx.stroke();
 
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#000";
