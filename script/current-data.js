@@ -375,12 +375,12 @@ $(document).ready(function() {
     frequencyView.style.fontFamily = "Khand";
     frequencyView.style.fontSize = "15px";
     frequencyView.style.textAlign = "center";
-    frequencyView.width = (sw);
-    frequencyView.height = (50);
+    frequencyView.width = (100);
+    frequencyView.height = (100);
     frequencyView.style.left = (0)+"px";
-    frequencyView.style.top = (0)+"px";
-    frequencyView.style.width = (sw)+"px";
-    frequencyView.style.height = (50)+"px";
+    frequencyView.style.top = ((sh/2)+125)+"px";
+    frequencyView.style.width = (100)+"px";
+    frequencyView.style.height = (100)+"px";
     //mapView.style.borderRadius = "25px";
     frequencyView.style.zIndex = "15";
     document.body.appendChild(frequencyView);
@@ -687,17 +687,17 @@ var drawImage = function() {
     0, 0, mapView.width, mapView.height);
 
     var frequenctCtx = frequencyView.getContext("2d");
-    frequenctCtx.clearRect(0, 0, sw, 50);
+    frequenctCtx.clearRect(0, 0, 100, 100);
 
     frequenctCtx.lineWidth = 1;
     frequenctCtx.strokeStyle = "#fff";
 
     frequenctCtx.beginPath();
-    frequenctCtx.moveTo((sw/2), 
-    25-((-0.5+((1/150)*frequencyPath[0]))*25));
+    frequenctCtx.moveTo(50, 
+    50-((-0.5+((1/150)*frequencyPath[0]))*50));
     for (var n = 1;  n < frequencyPath.length; n++) {
-        frequenctCtx.lineTo((sw/2)-n, 
-        25-((-0.5+((1/150)*frequencyPath[n]))*25));
+        frequenctCtx.lineTo(50-n, 
+        50-((-0.5+((1/150)*frequencyPath[n]))*50));
     }
     frequenctCtx.stroke();
 
@@ -803,13 +803,16 @@ var setShape_zoom = function(image) {
 
 var motionBlur = function() {
     var tempCanvas = document.createElement("canvas");
-    tempCanvas.width = mapView.width; 
+    tempCanvas.width = mapView.width;
     tempCanvas.height = mapView.height*3;
 
     var tempCtx = tempCanvas.getContext("2d");
 
-    tempCtx.filter = speedY < 201 ?
-    "blur("+(speedY/20)+"px)" : "none";
+    var diff = ((1/((201/20)-(190/20)))*((speedY/20)-(190/20)));
+
+    tempCtx.filter = speedY < 190 ?
+    "blur("+(speedY/20)+"px)" : 
+    "blur("+(1-diff)*(speedY/20)+"px)";
 
     tempCtx.drawImage(mapView,
     0, 0+offsetY,
