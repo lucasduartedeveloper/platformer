@@ -125,10 +125,12 @@ $(document).ready(function() {
         timerView.innerText = "0/"+maxCount;
     };
 
+    invertImage = false;
     invertDevice = false;
+
     mirrorView = document.createElement("img");
     mirrorView.style.position = "absolute";
-    mirrorView.style.opacity = 0;
+    //mirrorView.style.opacity = 0;
     mirrorView.style.objectFit = "cover";
     mirrorView.style.left = ((sw/2)-100)+"px";
     mirrorView.style.top = ((sh/2)+37.5)+"px";
@@ -142,18 +144,26 @@ $(document).ready(function() {
     mirrorView.src = "img/José.png";
     document.body.appendChild(mirrorView);
 
+    invertMode = 1;
     mirrorView.onclick = function() {
+        invertMode = invertMode == 0 ? 
+        1 : 0;
+
+        if (invertMode == 0)
         invertDevice = !invertDevice;
+        else
+        invertImage = !invertImage;
+
         mirrorView.style.transform = 
         !invertDevice ? "rotateY(-180deg)" : "";
 
         if (invertDevice) {
-            mirrorView.style.opacity = 1;
+            //mirrorView.style.opacity = 1;
             leftView.style.left = ((sw/2)-150)+"px";
             rightView.style.left = ((sw/2)+100)+"px";
         }
         else {
-            mirrorView.style.opacity = 0;
+            //mirrorView.style.opacity = 0;
             leftView.style.left = ((sw/2)+100)+"px";
             rightView.style.left = ((sw/2)-150)+"px";
         }
@@ -501,7 +511,7 @@ var drawImage = function() {
     ctx.imageSmoothingEnabled = false;
 
     ctx.save();
-    if (invertDevice) {
+    if (invertImage) {
         ctx.scale(-1, 1);
         ctx.translate(-201, 0);
     }
@@ -579,7 +589,7 @@ var updateBaseImage = function() {
     0, 0, previousMapView.width, previousMapView.height);
 
     baseCtx.save();
-    if (invertDevice) {
+    if (invertImage) {
         baseCtx.scale(-1, 1);
         baseCtx.translate(-201, 0);
     }
