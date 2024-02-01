@@ -196,12 +196,16 @@ $(document).ready(function() {
 
     var startX = 0;
     var startY = 0;
+    var moveX = 0;
+    var moveY = 0;
 
     var startRotation = 0;
 
     mirrorView.ontouchstart = function(e) {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
+        moveX = e.touches[0].clientX;
+        moveY = e.touches[0].clientY;
 
         startRotation = rotation;
 
@@ -209,17 +213,25 @@ $(document).ready(function() {
     };
 
     mirrorView.ontouchmove = function(e) {
-        var moveX = e.touches[0].clientX;
-        var moveY = e.touches[0].clientY;
+        moveX = e.touches[0].clientX;
+        moveY = e.touches[0].clientY;
 
         var offsetX = (1/sw)*(moveX-startX);
         offsetX = offsetX < 0 ? offsetX*2 : offsetX;
 
-        rotation = startRotation+(offsetX*(Math.PI/4));
+        rotation = startRotation+(offsetX*(Math.PI));
 
         mirrorView.style.transform = "rotateZ("+
         ((180/Math.PI)*rotation)+"deg)";
     };
+
+    mirrorView.ontouchend = function(e) {
+        if (moveX == startX)
+        rotation = 0;
+
+        mirrorView.style.transform = "rotateZ("+
+        ((180/Math.PI)*rotation)+"deg)";
+    }
 
     playView = document.createElement("button");
     playView.style.position = "absolute";
@@ -647,8 +659,13 @@ var setShape = function(image) {
         centerCtx.restore();
     }
 
+    ctx.save();
+    ctx.filter = "blur("+Math.abs((10/Math.PI)*rotation)+"px)";
+
     ctx.drawImage(canvas, 
     (size/2)-(size/2), (size/2)-(size/2), size, size);
+
+    ctx.restore();
 };
 
 var setShape_zoom = function(image) {
