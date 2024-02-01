@@ -646,7 +646,7 @@ var drawImage = function() {
     setShape(mapView);
 
     speedY = speedY > 0 ? (speedY+1) : 0;
-    speedY = speedY > 50 ? 50 : speedY;
+    speedY = speedY > 201 ? 201 : speedY;
 
     offsetY = offsetY >= mapView.height ? 0 : offsetY;
     offsetY += speedY;
@@ -655,7 +655,7 @@ var drawImage = function() {
     var acc = ((-0.5+((1/mapView.height)*offsetY))+rnd);
     console.log(acc);
 
-    var frequency = (50+speedY)+(acc*5);
+    var frequency = (10+(speedY/2))+(acc*(25-(speedY/8)));
 
     if (speedY > 0)
     oscillator.frequency.value = frequency;
