@@ -755,7 +755,7 @@ var setShape = function(image) {
     }
 
     ctx.save();
-    ctx.filter = "blur("+Math.abs((10/Math.PI)*rotation)+"px)";
+    //ctx.filter = "blur("+Math.abs((10/Math.PI)*rotation)+"px)";
 
     ctx.drawImage(canvas, 
     (size/2)-(size/2), (size/2)-(size/2), size, size);
