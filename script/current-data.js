@@ -532,7 +532,7 @@ var drawImage = function() {
 
     if (imagesLoaded) combineImageData();
 
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 3;
     ctx.strokeStyle = "#000";
 
     ctx.beginPath();
