@@ -666,12 +666,12 @@ var drawImage = function() {
     speedY = speedY > 0 ? (speedY+1) : 0;
     speedY = speedY > 201 ? 201 : speedY;
 
-    offsetY = offsetY >= mapView.height ? 0 : offsetY;
     offsetY += speedY;
+    offsetY = offsetY >= mapView.height ? 0 : offsetY;
 
     var rnd = -0.005+(Math.random()*0.01);
     var acc = ((-0.5+((1/mapView.height)*offsetY))+rnd);
-    console.log(acc);
+    //console.log(acc);
 
     var frequency = (50+(speedY/2))+(acc*(10-(speedY/20)));
     frequencyPath.splice(0, 0, frequency);
@@ -679,28 +679,12 @@ var drawImage = function() {
     if (speedY > 0)
     oscillator.frequency.value = frequency;
 
-    var tempCanvas = document.createElement("canvas");
-    tempCanvas.width = mapView.width; 
-    tempCanvas.height = mapView.height;
-
-    var tempCtx = tempCanvas.getContext("2d");
-
-    tempCtx.filter = speedY < 201 ?
-    "blur("+(speedY/20)+"px)" : "none";
-
-    tempCtx.drawImage(mapView, 0, -(mapView.height*2)+offsetY,
-    mapView.width, mapView.height);
-
-    tempCtx.drawImage(mapView, 0, -mapView.height+offsetY,
-    mapView.width, mapView.height);
-
-    tempCtx.drawImage(mapView, 0, 0+offsetY,
-    mapView.width, mapView.height);
-
+    var tempCanvas = motionBlur();
     ctx.clearRect(0, 0, mapView.width, mapView.height);
 
-    ctx.drawImage(tempCanvas, 0, 0, 
-    mapView.width, mapView.height);
+    ctx.drawImage(tempCanvas, 0, mapView.height, 
+    mapView.width, mapView.height, 
+    0, 0, mapView.width, mapView.height);
 
     var frequenctCtx = frequencyView.getContext("2d");
     frequenctCtx.clearRect(0, 0, sw, 50);
@@ -815,6 +799,52 @@ var setShape_zoom = function(image) {
 
     ctx.drawImage(canvas, 
     (size/2)-(size/2), (size/2)-(size/2), size, size);
+};
+
+var motionBlur = function() {
+    var tempCanvas = document.createElement("canvas");
+    tempCanvas.width = mapView.width; 
+    tempCanvas.height = mapView.height*3;
+
+    var tempCtx = tempCanvas.getContext("2d");
+
+    tempCtx.filter = speedY < 201 ?
+    "blur("+(speedY/20)+"px)" : "none";
+
+    tempCtx.drawImage(mapView,
+    0, 0+offsetY,
+    mapView.width, mapView.height);
+
+    tempCtx.drawImage(mapView,
+    0, mapView.height+offsetY,
+    mapView.width, mapView.height);
+
+    tempCtx.drawImage(mapView,
+    n, (mapView.height*2)+offsetY,
+    mapView.width, mapView.height);
+
+    return tempCanvas;
+
+    for (var n = 0; n < 201; n++) {
+        var offset = n % 2 == 0 ? (offsetY/2) : -offsetY;
+
+        tempCtx.drawImage(mapView,
+        n, 0, 1, mapView.height,
+        n, 0+offset,
+        1, mapView.height);
+
+        tempCtx.drawImage(mapView,
+        n, 0, 1, mapView.height,
+        n, mapView.height+offset,
+        1, mapView.height);
+
+        tempCtx.drawImage(mapView,
+        n, 0, 1, mapView.height,
+        n, (mapView.height*2)+offset,
+        1, mapView.height);
+    }
+
+    return tempCanvas;
 };
 
 Math.curve = function(value, scale) {
