@@ -135,11 +135,13 @@ $(document).ready(function() {
     speedY = 0;
     accView.ontouchstart = function(e) {
         speedY = 1;
+        oscillator.start();
     };
 
     accView.ontouchend = function(e) {
         offsetY = 0;
         speedY = 0;
+        oscillator.frequency.value = 0;
     };
 
     waterHeightView = document.createElement("span");
@@ -472,6 +474,10 @@ $(document).ready(function() {
         img_list[0], img_list[0].naturalWidth, img_list[0].naturalHeight);
     });
 
+    $("*").css("user-select", "none");
+
+    oscillator = createOscillator();
+
     drawImage();
     animate();
 });
@@ -644,8 +650,18 @@ var drawImage = function() {
 
     offsetY = offsetY >= mapView.height ? 0 : offsetY;
     offsetY += speedY;
+
+    var rnd = -0.005+(Math.random()*0.01);
+    var acc = ((-0.5+((1/mapView.height)*offsetY))+rnd);
+    console.log(acc);
+
+    var frequency = 50+(acc*5);
+
+    if (speedY > 0)
+    oscillator.frequency.value = frequency;
+
     var tempCanvas = document.createElement("canvas");
-    tempCanvas.width = mapView.width;
+    tempCanvas.width = mapView.width; 
     tempCanvas.height = mapView.height;
 
     var tempCtx = tempCanvas.getContext("2d");
