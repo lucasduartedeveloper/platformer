@@ -385,6 +385,23 @@ $(document).ready(function() {
     frequencyView.style.zIndex = "15";
     document.body.appendChild(frequencyView);
 
+    previous1MapStoreView = document.createElement("canvas");
+    previous1MapStoreView.style.position = "absolute";
+    previous1MapStoreView.style.imageRendering = "pixelated";
+    previous1MapStoreView.style.background = "#fff";
+    previous1MapStoreView.style.fontFamily = "Khand";
+    previous1MapStoreView.style.fontSize = "15px";
+    previous1MapStoreView.style.textAlign = "center";
+    previous1MapStoreView.width = (201);
+    previous1MapStoreView.height = (201);
+    previous1MapStoreView.style.left = ((sw/2)-100)+"px";
+    previous1MapStoreView.style.top = ((sh/2)-275)+"px";
+    previous1MapStoreView.style.width = (200)+"px";
+    previous1MapStoreView.style.height = (200)+"px";
+    //mapView.style.borderRadius = "25px";
+    previous1MapStoreView.style.zIndex = "15";
+    document.body.appendChild(previous1MapStoreView);
+
     previousMapStoreView = document.createElement("canvas");
     previousMapStoreView.style.position = "absolute";
     previousMapStoreView.style.imageRendering = "pixelated";
@@ -488,6 +505,8 @@ $(document).ready(function() {
 
     websocketBot.attachMessageHandler();
     loadImages(function() {
+        drawPreviousBaseImage(
+        img_list[1], img_list[1].naturalWidth, img_list[1].naturalHeight);
         drawBaseImage(
         img_list[0], img_list[0].naturalWidth, img_list[0].naturalHeight);
     });
@@ -501,7 +520,8 @@ $(document).ready(function() {
 });
 
 var img_list = [
-    "img/picture-0.png"
+    "img/picture-0.png",
+    "img/picture-2.png"
 ];
 
 var imagesLoaded = false;
@@ -624,6 +644,8 @@ var animate = function() {
     renderTime = new Date().getTime();
     requestAnimationFrame(animate);
 };
+
+var frameOrder == 0;
 
 var hasNewData = false;
 var drawImage = function() {
@@ -886,6 +908,30 @@ var drawBaseImage = function(image, width, height) {
     0, 0, previousMapView.width, previousMapView.height);
 
     updateBaseImage();
+};
+
+var drawPreviousBaseImage = function(image, width, height) {
+    var baseStoreCtx = previous1MapStoreView.getContext("2d");
+    baseStoreCtx.imageSmoothingEnabled = false;
+
+    //console.log(image, width, height);
+    baseStoreCtx.clearRect(
+    0, 0, previous1MapStoreView.width, 
+    previous1MapStoreView.height);
+
+    var video = {
+        width: width,
+        height: height
+    };
+    var frame = {
+        width: getSquare(video),
+        height: getSquare(video)
+    };
+    var format = fitImageCover(video, frame);
+
+    baseStoreCtx.drawImage(image,
+    -format.left, -format.top, frame.width, frame.height, 
+    0, 0, previousMapView.width, previousMapView.height);
 };
 
 var updateBaseImage = function() {
