@@ -140,9 +140,12 @@ $(document).ready(function() {
     mirrorView.style.borderRadius = "25px";
     mirrorView.style.transform = 
     invertDevice ? "rotateY(-180deg)" : "";
+    mirrorView.style.filter = "invert(1)";
     mirrorView.style.zIndex = "15";
-    mirrorView.src = "img/José.png";
     document.body.appendChild(mirrorView);
+
+    var rnd = Math.random();
+    mirrorView.src = "img/steering-wheel-0.png?rnd="+rnd;
 
     invertMode = 1;
     mirrorView.onclick = function() {
