@@ -125,6 +125,39 @@ $(document).ready(function() {
         timerView.innerText = "0/"+maxCount;
     };
 
+    invertDevice = false;
+    mirrorView = document.createElement("img");
+    mirrorView.style.position = "absolute";
+    mirrorView.style.objectFit = "cover";
+    mirrorView.style.left = ((sw/2)-100)+"px";
+    mirrorView.style.top = ((sh/2)+37.5)+"px";
+    mirrorView.style.width = (50)+"px";
+    mirrorView.style.height = (50)+"px";
+    //waterHeightView.style.border = "1px solid white";
+    mirrorView.style.borderRadius = "25px";
+    mirrorView.style.transform = 
+    invertDevice ? "rotateY(-180deg)" : "";
+    mirrorView.style.zIndex = "15";
+    mirrorView.src = "img/José.png";
+    document.body.appendChild(mirrorView);
+
+    mirrorView.onclick = function() {
+        invertDevice = !invertDevice;
+        mirrorView.style.transform = 
+        invertDevice ? "rotateY(-180deg)" : "";
+
+        if (invertDevice) {
+            leftView.style.left = ((sw/2)+100)+"px";
+            rightView.style.left = ((sw/2)-150)+"px";
+        }
+        else {
+            leftView.style.left = ((sw/2)-150)+"px";
+            rightView.style.left = ((sw/2)+100)+"px";
+        }
+
+        updateBaseImage();
+    };
+
     playView = document.createElement("button");
     playView.style.position = "absolute";
     playView.style.color = "#000";
@@ -223,6 +256,23 @@ $(document).ready(function() {
         }, 100);
     };
 
+    previousMapStoreView = document.createElement("canvas");
+    previousMapStoreView.style.position = "absolute";
+    previousMapStoreView.style.imageRendering = "pixelated";
+    previousMapStoreView.style.background = "#fff";
+    previousMapStoreView.style.fontFamily = "Khand";
+    previousMapStoreView.style.fontSize = "15px";
+    previousMapStoreView.style.textAlign = "center";
+    previousMapStoreView.width = (201);
+    previousMapStoreView.height = (201);
+    previousMapStoreView.style.left = ((sw/2)-100)+"px";
+    previousMapStoreView.style.top = ((sh/2)-275)+"px";
+    previousMapStoreView.style.width = (200)+"px";
+    previousMapStoreView.style.height = (200)+"px";
+    //mapView.style.borderRadius = "25px";
+    previousMapStoreView.style.zIndex = "15";
+    document.body.appendChild(previousMapStoreView);
+
     previousMapView = document.createElement("canvas");
     previousMapView.style.position = "absolute";
     previousMapView.style.imageRendering = "pixelated";
@@ -256,6 +306,36 @@ $(document).ready(function() {
     //mapView.style.borderRadius = "25px";
     mapView.style.zIndex = "15";
     document.body.appendChild(mapView);
+
+    leftView = document.createElement("span");
+    leftView.style.position = "absolute";
+    leftView.innerText = "L";
+    leftView.style.color = "#fff";
+    leftView.style.fontFamily = "Khand";
+    leftView.style.fontSize = "15px";
+    leftView.style.textAlign = "center";
+    leftView.style.left = ((sw/2)-150)+"px";
+    leftView.style.top = ((sh/2)-187.5)+"px";
+    leftView.style.width = (50)+"px";
+    leftView.style.height = (25)+"px";
+    //mapView.style.borderRadius = "25px";
+    leftView.style.zIndex = "15";
+    document.body.appendChild(leftView);
+
+    rightView = document.createElement("span");
+    rightView.style.position = "absolute";
+    rightView.innerText = "R";
+    rightView.style.color = "#fff";
+    rightView.style.fontFamily = "Khand";
+    rightView.style.fontSize = "15px";
+    rightView.style.textAlign = "center";
+    rightView.style.left = ((sw/2)+100)+"px";
+    rightView.style.top = ((sh/2)-187.5)+"px";
+    rightView.style.width = (50)+"px";
+    rightView.style.height = (25)+"px";
+    //mapView.style.borderRadius = "25px";
+    rightView.style.zIndex = "15";
+    document.body.appendChild(rightView);
 
     cameraView = document.createElement("video");
     cameraView.style.position = "absolute";
@@ -417,6 +497,12 @@ var drawImage = function() {
     var ctx = mapView.getContext("2d");
     ctx.imageSmoothingEnabled = false;
 
+    ctx.save();
+    if (invertDevice) {
+        ctx.scale(-1, 1);
+        ctx.translate(-201, 0);
+    }
+
     if (cameraOn) {
         var video = {
             width: vw,
@@ -433,6 +519,8 @@ var drawImage = function() {
         0, 0, mapView.width, mapView.height);
     }
 
+    ctx.restore();
+
     if (hasNewData) {
         drawBaseImage(
         mapView, mapView.width, mapView.height);
@@ -443,12 +531,12 @@ var drawImage = function() {
 };
 
 var drawBaseImage = function(image, width, height) {
-    var baseCtx = previousMapView.getContext("2d");
-    baseCtx.imageSmoothingEnabled = false;
+    var baseStoreCtx = previousMapStoreView.getContext("2d");
+    baseStoreCtx.imageSmoothingEnabled = false;
 
     //console.log(image, width, height);
-    baseCtx.clearRect(
-    0, 0, previousMapView.width, previousMapView.height);
+    baseStoreCtx.clearRect(
+    0, 0, previousMapStoreView.width, previousMapStoreView.height);
 
     var video = {
         width: width,
@@ -460,9 +548,30 @@ var drawBaseImage = function(image, width, height) {
     };
     var format = fitImageCover(video, frame);
 
-    baseCtx.drawImage(image,
+    baseStoreCtx.drawImage(image,
     -format.left, -format.top, frame.width, frame.height, 
     0, 0, previousMapView.width, previousMapView.height);
+
+    updateBaseImage();
+};
+
+var updateBaseImage = function() {
+    var baseCtx = previousMapView.getContext("2d");
+    baseCtx.imageSmoothingEnabled = false;
+
+    baseCtx.clearRect(
+    0, 0, previousMapView.width, previousMapView.height);
+
+    baseCtx.save();
+    if (invertDevice) {
+        baseCtx.scale(-1, 1);
+        baseCtx.translate(-201, 0);
+    }
+
+    baseCtx.drawImage(previousMapStoreView, 
+    0, 0, previousMapView.width, previousMapView.height);
+
+    baseCtx.restore();
 };
 
 var hasLog = false;
