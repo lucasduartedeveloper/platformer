@@ -128,6 +128,7 @@ $(document).ready(function() {
     invertDevice = false;
     mirrorView = document.createElement("img");
     mirrorView.style.position = "absolute";
+    mirrorView.style.opacity = 0;
     mirrorView.style.objectFit = "cover";
     mirrorView.style.left = ((sw/2)-100)+"px";
     mirrorView.style.top = ((sh/2)+37.5)+"px";
@@ -144,15 +145,17 @@ $(document).ready(function() {
     mirrorView.onclick = function() {
         invertDevice = !invertDevice;
         mirrorView.style.transform = 
-        invertDevice ? "rotateY(-180deg)" : "";
+        !invertDevice ? "rotateY(-180deg)" : "";
 
         if (invertDevice) {
-            leftView.style.left = ((sw/2)+100)+"px";
-            rightView.style.left = ((sw/2)-150)+"px";
-        }
-        else {
+            mirrorView.style.opacity = 1;
             leftView.style.left = ((sw/2)-150)+"px";
             rightView.style.left = ((sw/2)+100)+"px";
+        }
+        else {
+            mirrorView.style.opacity = 0;
+            leftView.style.left = ((sw/2)+100)+"px";
+            rightView.style.left = ((sw/2)-150)+"px";
         }
 
         updateBaseImage();
@@ -314,7 +317,7 @@ $(document).ready(function() {
     leftView.style.fontFamily = "Khand";
     leftView.style.fontSize = "15px";
     leftView.style.textAlign = "center";
-    leftView.style.left = ((sw/2)-150)+"px";
+    leftView.style.left = ((sw/2)+100)+"px";
     leftView.style.top = ((sh/2)-187.5)+"px";
     leftView.style.width = (50)+"px";
     leftView.style.height = (25)+"px";
@@ -329,7 +332,7 @@ $(document).ready(function() {
     rightView.style.fontFamily = "Khand";
     rightView.style.fontSize = "15px";
     rightView.style.textAlign = "center";
-    rightView.style.left = ((sw/2)+100)+"px";
+    rightView.style.left = ((sw/2)-150)+"px";
     rightView.style.top = ((sh/2)-187.5)+"px";
     rightView.style.width = (50)+"px";
     rightView.style.height = (25)+"px";
@@ -526,6 +529,19 @@ var drawImage = function() {
         mapView, mapView.width, mapView.height);
         hasNewData = false;
     }
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#000";
+
+    ctx.beginPath();
+    ctx.moveTo(0, (200/2));
+    ctx.lineTo((200/4), (200/2));
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo((200/4)*3, (200/2));
+    ctx.lineTo(200, (200/2));
+    ctx.stroke();
 
     if (imagesLoaded) combineImageData();
 };
