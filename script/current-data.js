@@ -64,6 +64,53 @@ $(document).ready(function() {
     titleView.style.zIndex = "15";
     document.body.appendChild(titleView);
 
+    plateView = document.createElement("span");
+    plateView.style.position = "absolute";
+    plateView.style.userSelect = "none";
+    plateView.style.background = "#fff";
+    plateView.style.color = "#000";
+    plateView.innerText = "YBX-4728";
+    plateView.style.fontFamily = "Khand";
+    plateView.style.fontSize = "15px";
+    plateView.style.fontWeight = 900;
+    plateView.style.lineHeight = "30px";
+    plateView.style.textAlign = "center";
+    plateView.style.left = ((sw/2)-25)+"px";
+    plateView.style.top = ((sh/2)+200)+"px";
+    plateView.style.width = (50)+"px";
+    plateView.style.height = (25)+"px";
+    //waterHeightView.style.border = "1px solid white";
+    plateView.style.borderRadius = "5px";
+    plateView.style.zIndex = "15";
+    document.body.appendChild(plateView);
+
+    invertMode = 1;
+    plateView.onclick = function() {
+        invertMode = invertMode == 0 ? 
+        1 : 0;
+
+        if (invertMode == 0)
+        invertDevice = !invertDevice;
+        else
+        invertImage = !invertImage;
+
+        plateView.style.transform = 
+        !invertDevice ? "rotateY(-180deg)" : "";
+
+        if (invertDevice) {
+            //mirrorView.style.opacity = 1;
+            leftView.style.left = ((sw/2)-150)+"px";
+            rightView.style.left = ((sw/2)+100)+"px";
+        }
+        else {
+            //mirrorView.style.opacity = 0;
+            leftView.style.left = ((sw/2)+100)+"px";
+            rightView.style.left = ((sw/2)-150)+"px";
+        }
+
+        updateBaseImage();
+    };
+
     waterHeightView = document.createElement("span");
     waterHeightView.style.position = "absolute";
     waterHeightView.style.color = "#fff";
@@ -147,31 +194,31 @@ $(document).ready(function() {
     var rnd = Math.random();
     mirrorView.src = "img/steering-wheel-0.png?rnd="+rnd;
 
-    invertMode = 1;
-    mirrorView.onclick = function() {
-        invertMode = invertMode == 0 ? 
-        1 : 0;
+    var startX = 0;
+    var startY = 0;
 
-        if (invertMode == 0)
-        invertDevice = !invertDevice;
-        else
-        invertImage = !invertImage;
+    var startRotation = 0;
 
-        mirrorView.style.transform = 
-        !invertDevice ? "rotateY(-180deg)" : "";
+    mirrorView.ontouchstart = function(e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
 
-        if (invertDevice) {
-            //mirrorView.style.opacity = 1;
-            leftView.style.left = ((sw/2)-150)+"px";
-            rightView.style.left = ((sw/2)+100)+"px";
-        }
-        else {
-            //mirrorView.style.opacity = 0;
-            leftView.style.left = ((sw/2)+100)+"px";
-            rightView.style.left = ((sw/2)-150)+"px";
-        }
+        startRotation = rotation;
 
-        updateBaseImage();
+        console.log(startX, startY, rotation);
+    };
+
+    mirrorView.ontouchmove = function(e) {
+        var moveX = e.touches[0].clientX;
+        var moveY = e.touches[0].clientY;
+
+        var offsetX = (1/sw)*(moveX-startX);
+        offsetX = offsetX < 0 ? offsetX*2 : offsetX;
+
+        rotation = startRotation+(offsetX*(Math.PI/4));
+
+        mirrorView.style.transform = "rotateZ("+
+        ((180/Math.PI)*rotation)+"deg)";
     };
 
     playView = document.createElement("button");
@@ -545,18 +592,114 @@ var drawImage = function() {
 
     if (imagesLoaded) combineImageData();
 
+    setShape(mapView);
+
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#000";
 
     ctx.beginPath();
     ctx.moveTo(0, (201/2));
     ctx.lineTo((201/4), (201/2));
-    ctx.stroke();
+    //ctx.stroke();
 
     ctx.beginPath();
     ctx.moveTo((201/4)*3, (201/2));
     ctx.lineTo(201, (201/2));
-    ctx.stroke();
+    //ctx.stroke();
+};
+
+var rotation = 0;
+var setShape = function(image) {
+    var ctx = image.getContext("2d");
+    var size = 201;
+
+    var canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+
+    var centerCtx = canvas.getContext("2d");
+    centerCtx.imageSmoothingEnabled = true;
+
+    centerCtx.lineWidth = 0.5;
+    centerCtx.strokeStyle = "#fff";
+
+    for (var n = 0; n < 50 ; n++) {
+        var radius = (1-((1/50)*n))*(size/2);
+        centerCtx.save();
+        centerCtx.translate((size/2), (size/2));
+        centerCtx.rotate(-n*(rotation/50));
+        centerCtx.translate(-(size/2), -(size/2));
+
+        centerCtx.beginPath();
+        centerCtx.arc((size/2), (size/2), radius, 0, (Math.PI*2));
+        //drawPolygon(centerCtx, 75, 75, radius);
+        //centerCtx.stroke();
+        centerCtx.clip();
+
+        var scale = 1; //1+(Math.curve((1/50)*n, 1)*0.5);
+        //console.log(scale);
+
+        centerCtx.drawImage(image, 
+        (size/2)-((size/2)/scale), (size/2)-((size/2)/scale),
+        (size/scale), (size/scale),
+        0, 0, size, size);
+
+        centerCtx.restore();
+    }
+
+    ctx.drawImage(canvas, 
+    (size/2)-(size/2), (size/2)-(size/2), size, size);
+};
+
+var setShape_zoom = function(image) {
+    var ctx = image.getContext("2d");
+    var size = 201;
+
+    var canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+
+    var centerCtx = canvas.getContext("2d");
+    centerCtx.imageSmoothingEnabled = true;
+
+    centerCtx.lineWidth = 0.5;
+    centerCtx.strokeStyle = "#fff";
+
+    for (var n = 0; n < 50 ; n++) {
+        var radius = (1-((1/50)*n))*(size/2);
+        centerCtx.save();
+        centerCtx.beginPath();
+        centerCtx.arc((size/2), (size/2), radius, 0, (Math.PI*2));
+        //drawPolygon(centerCtx, 75, 75, radius);
+        //centerCtx.stroke();
+        centerCtx.clip();
+
+        var scale = 1+(Math.curve((1/50)*n, 1)*0.5);
+        //console.log(scale);
+
+        centerCtx.drawImage(image, 
+        (size/2)-((size/2)/scale), (size/2)-((size/2)/scale),
+        (size/scale), (size/scale),
+        0, 0, size, size);
+
+        centerCtx.restore();
+    }
+
+    ctx.drawImage(canvas, 
+    (size/2)-(size/2), (size/2)-(size/2), size, size);
+};
+
+Math.curve = function(value, scale) {
+    var c = {
+        x: 0,
+        y: 0
+    };
+    var p = {
+        x: -1,
+        y: 0
+    };
+    var rp = _rotate2d(c, p, (value*90));
+    return rp.y*scale;
 };
 
 var drawBaseImage = function(image, width, height) {
