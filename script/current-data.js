@@ -530,20 +530,20 @@ var drawImage = function() {
         hasNewData = false;
     }
 
-    ctx.lineWidth = 3;
+    if (imagesLoaded) combineImageData();
+
+    ctx.lineWidth = 5;
     ctx.strokeStyle = "#000";
 
     ctx.beginPath();
-    ctx.moveTo(0, (200/2));
-    ctx.lineTo((200/4), (200/2));
+    ctx.moveTo(0, (201/2));
+    ctx.lineTo((201/4), (201/2));
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo((200/4)*3, (200/2));
-    ctx.lineTo(200, (200/2));
+    ctx.moveTo((201/4)*3, (201/2));
+    ctx.lineTo(201, (201/2));
     ctx.stroke();
-
-    if (imagesLoaded) combineImageData();
 };
 
 var drawBaseImage = function(image, width, height) {
