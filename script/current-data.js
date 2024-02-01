@@ -50,6 +50,7 @@ $(document).ready(function() {
 
     titleView = document.createElement("span");
     titleView.style.position = "absolute";
+    titleView.style.userSelect = "none";
     titleView.style.color = "#fff";
     titleView.innerText = "CURRENT DATA";
     titleView.style.fontFamily = "Khand";
@@ -111,8 +112,39 @@ $(document).ready(function() {
         updateBaseImage();
     };
 
+    accView = document.createElement("div");
+    accView.style.position = "absolute";
+    accView.style.userSelect = "none";
+    accView.style.background = "#fff";
+    accView.style.color = "#000";
+    accView.style.fontFamily = "Khand";
+    accView.style.fontSize = "15px";
+    accView.style.fontWeight = 900;
+    accView.style.lineHeight = "30px";
+    accView.style.textAlign = "center";
+    accView.style.left = ((sw/2)+50)+"px";
+    accView.style.top = ((sh/2)+187.5)+"px";
+    accView.style.width = (25)+"px";
+    accView.style.height = (50)+"px";
+    //waterHeightView.style.border = "1px solid white";
+    accView.style.borderRadius = "5px";
+    accView.style.zIndex = "15";
+    document.body.appendChild(accView);
+
+    offsetY = 0;
+    speedY = 0;
+    accView.ontouchstart = function(e) {
+        speedY = 1;
+    };
+
+    accView.ontouchend = function(e) {
+        offsetY = 0;
+        speedY = 0;
+    };
+
     waterHeightView = document.createElement("span");
     waterHeightView.style.position = "absolute";
+    waterHeightView.style.userSelect = "none";
     waterHeightView.style.color = "#fff";
     waterHeightView.innerText = "Water height: 0 mm";
     waterHeightView.style.fontFamily = "Khand";
@@ -128,6 +160,7 @@ $(document).ready(function() {
     document.body.appendChild(waterHeightView);
 
     windVelocityView = document.createElement("span");
+    windVelocityView.style.userSelect = "none";
     windVelocityView.style.position = "absolute";
     windVelocityView.style.color = "#fff";
     windVelocityView.innerText = "Wind velocity: 0 m/s";
@@ -146,6 +179,7 @@ $(document).ready(function() {
     maxCount = 1;
     timerView = document.createElement("span");
     timerView.style.position = "absolute";
+    timerView.style.userSelect = "none";
     timerView.style.color = "#fff";
     timerView.innerText = "0/"+maxCount;
     timerView.style.fontFamily = "Khand";
@@ -603,8 +637,31 @@ var drawImage = function() {
     }
 
     if (imagesLoaded) combineImageData();
-
     setShape(mapView);
+
+    speedY = speedY > 0 ? (speedY+1) : 0;
+    speedY = speedY > 50 ? 50 : speedY;
+
+    offsetY = offsetY >= mapView.height ? 0 : offsetY;
+    offsetY += speedY;
+    var tempCanvas = document.createElement("canvas");
+    tempCanvas.width = mapView.width;
+    tempCanvas.height = mapView.height;
+
+    var tempCtx = tempCanvas.getContext("2d");
+
+    tempCtx.filter = "blur("+(speedY/10)+"px)";
+
+    tempCtx.drawImage(mapView, 0, -mapView.height+offsetY,
+    mapView.width, mapView.height);
+
+    tempCtx.drawImage(mapView, 0, 0+offsetY,
+    mapView.width, mapView.height);
+
+    ctx.clearRect(0, 0, mapView.width, mapView.height);
+
+    ctx.drawImage(tempCanvas, 0, 0, 
+    mapView.width, mapView.height);
 
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#000";
