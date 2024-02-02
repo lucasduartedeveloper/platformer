@@ -519,7 +519,7 @@ $(document).ready(function() {
 
     threshold = 1;
     limitReached = false;
-    motion = true;
+    motion = false;
     lastState = { x: 0, y: 0, z: 0 };
     gyroUpdated = function(e) {
         var diffX = Math.abs(e.accX - lastState.x);
