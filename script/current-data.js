@@ -515,7 +515,7 @@ $(document).ready(function() {
 
     oscillator = createOscillator();
 
-    audio = new Audio("audio/stuck-audio-0.wav");
+    audio = new Audio("audio/stuck-audio-1.wav");
 
     threshold = 1;
     limitReached = false;
@@ -574,8 +574,13 @@ $(document).ready(function() {
     document.body.appendChild(recordedTextView);
 
     recordedTextView.onclick = function() {
+        if (!navigator.getUserMedia) {
+            audio.play();
+            return;
+        }
+
         if (mic.closed)
-        mic.open();
+        mic.open(false, 1);
     };
 
     var frequencyArr = [
@@ -616,7 +621,7 @@ $(document).ready(function() {
 });
 
 var img_list = [
-    "img/picture-0.png",
+    "img/picture-3.png",
     "img/picture-2.png"
 ];
 
