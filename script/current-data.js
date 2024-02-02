@@ -574,14 +574,28 @@ $(document).ready(function() {
     document.body.appendChild(recordedTextView);
 
     recordedTextView.onclick = function() {
-        if (audio.paused)
-        audio.play();
+        if (mic.closed)
+        mic.open();
     };
 
     var frequencyArr = [
        { value: 100, char: "A" },
        { value: 100, char: "B" }
     ];
+
+    mic = new EasyMicrophone();
+    mic.onsuccess = function() { 
+        console.log("mic open");
+    };
+    mic.onupdate = function(freqArray, reachedFreq, avgValue) {
+        micAvgValue = avgValue;
+
+        var value = ((1/250)*reachedFreq)/2;
+        recordedFrequencyPath.splice(0, 0, value);
+    };
+    mic.onclose = function() { 
+        console.log("mic closed");
+    };
 
     media = new MediaAnalyser(audio, false, 1);
     media.onstart =function() {
@@ -592,25 +606,9 @@ $(document).ready(function() {
 
         var value = ((1/250)*reachedFreq)/2;
         recordedFrequencyPath.splice(0, 0, value);
-        console.log(value);
     };
     media.onstop = function() {
         this.closed = true;
-
-        var ctx = recordedFrequencyView.getContext("2d");
-        ctx.clearRect(0, 0, sw, 50);
-
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "#fff";
-
-        ctx.beginPath();
-        ctx.moveTo((sw/2), 
-        25-((-0.5+recordedFrequencyPath[0])*25));
-        for (var n = 1; n < recordedFrequencyPath.length; n++) {
-            ctx.lineTo((sw/2)-n, 
-            25-((-0.5+recordedFrequencyPath[n])*25));
-        }
-        ctx.stroke();
     };
 
     drawImage();
@@ -848,6 +846,21 @@ var drawImage = function() {
         50-((-0.5+((1/150)*frequencyPath[n]))*50));
     }
     frequenctCtx.stroke();
+
+    var recordedCtx = recordedFrequencyView.getContext("2d");
+    recordedCtx.clearRect(0, 0, sw, 50);
+
+    recordedCtx.lineWidth = 1;
+    recordedCtx.strokeStyle = "#fff";
+
+    recordedCtx.beginPath();
+    recordedCtx.moveTo((sw/2), 
+    25-((-0.5+recordedFrequencyPath[0])*25));
+    for (var n = 1; n < recordedFrequencyPath.length; n++) {
+        recordedCtx.lineTo((sw/2)-n, 
+        25-((-0.5+recordedFrequencyPath[n])*25));
+    }
+    recordedCtx.stroke();
 
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#000";
