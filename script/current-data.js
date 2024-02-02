@@ -541,16 +541,76 @@ $(document).ready(function() {
         lastState = { x: e.accX, y: e.accY, z: e.accZ };
     };
 
+    recordedFrequencyPath = [];
+    recordedFrequencyView = document.createElement("canvas");
+    recordedFrequencyView.style.position = "absolute";
+    recordedFrequencyView.style.imageRendering = "pixelated";
+    recordedFrequencyView.style.fontFamily = "Khand";
+    recordedFrequencyView.style.fontSize = "15px";
+    recordedFrequencyView.style.textAlign = "center";
+    recordedFrequencyView.width = (sw);
+    recordedFrequencyView.height = (50);
+    recordedFrequencyView.style.left = (0)+"px";
+    recordedFrequencyView.style.top = (sh-50)+"px";
+    recordedFrequencyView.style.width = (sw)+"px";
+    recordedFrequencyView.style.height = (50)+"px";
+    recordedFrequencyView.style.zIndex = "15";
+    document.body.appendChild(recordedFrequencyView);
+
+    recordedTextView = document.createElement("span");
+    recordedTextView.style.position = "absolute";
+    recordedTextView.style.imageRendering = "pixelated";
+    recordedTextView.style.color = "#fff";
+    recordedTextView.innerText = "OI";
+    recordedTextView.style.fontFamily = "Khand";
+    recordedTextView.style.fontSize = "15px";
+    recordedTextView.style.lineHeight = "25px";
+    recordedTextView.style.textAlign = "left";
+    recordedTextView.style.left = ((sw/2)+10)+"px";
+    recordedTextView.style.top = (sh-37.5)+"px";
+    recordedTextView.style.width = (50)+"px";
+    recordedTextView.style.height = (25)+"px";
+    recordedTextView.style.zIndex = "15";
+    document.body.appendChild(recordedTextView);
+
+    recordedTextView.onclick = function() {
+        if (audio.paused)
+        audio.play();
+    };
+
+    var frequencyArr = [
+       { value: 100, char: "A" },
+       { value: 100, char: "B" }
+    ];
+
     media = new MediaAnalyser(audio, false, 1);
     media.onstart =function() {
-        frequencyPath = [];
+        recordedFrequencyPath = [];
     };
     media.onupdate = function(freqArray, reachedFreq, avgValue) {
         micAvgValue = avgValue;
 
         var value = ((1/250)*reachedFreq)/2;
-        frequencyPath.splice(0, 0, value);
+        recordedFrequencyPath.splice(0, 0, value);
         console.log(value);
+    };
+    media.onstop = function() {
+        this.closed = true;
+
+        var ctx = recordedFrequencyView.getContext("2d");
+        ctx.clearRect(0, 0, sw, 50);
+
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#fff";
+
+        ctx.beginPath();
+        ctx.moveTo((sw/2), 
+        25-((-0.5+recordedFrequencyPath[0])*25));
+        for (var n = 1; n < recordedFrequencyPath.length; n++) {
+            ctx.lineTo((sw/2)-n, 
+            25-((-0.5+recordedFrequencyPath[n])*25));
+        }
+        ctx.stroke();
     };
 
     drawImage();
