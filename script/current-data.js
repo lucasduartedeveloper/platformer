@@ -515,7 +515,7 @@ $(document).ready(function() {
 
     oscillator = createOscillator();
 
-    audio = new Audio("audio/stuck-audio-1.wav");
+    audio = new Audio("audio/stuck-audio-0.wav");
 
     threshold = 1;
     limitReached = false;
@@ -615,6 +615,68 @@ $(document).ready(function() {
     media.onstop = function() {
         this.closed = true;
     };
+
+    numericKeyboardActive = false;
+    numericKeyboardView = document.createElement("i");
+    numericKeyboardView.style.position = "absolute";
+    numericKeyboardView.style.color = "#fff";
+    numericKeyboardView.className = "fa-solid fa-keyboard";
+    numericKeyboardView.style.fontSize = "25px";
+    numericKeyboardView.style.lineHeight = "25px";
+    numericKeyboardView.style.textAlign = "left";
+    numericKeyboardView.style.left = ((sw/2)-12.5)+"px";
+    numericKeyboardView.style.top = ((sh/2)-50)+"px";
+    numericKeyboardView.style.width = (25)+"px";
+    numericKeyboardView.style.height = (25)+"px";
+    numericKeyboardView.style.border = "none";
+    numericKeyboardView.style.borderRadius = "12.5px";
+    numericKeyboardView.style.zIndex = "15";
+    document.body.appendChild(numericKeyboardView);
+
+    numericKeyboardView.onclick = function() {
+        numericKeyboardActive = !numericKeyboardActive;
+        numberContainerView.style.display = 
+        numericKeyboardActive ? "initial" : "none";
+    };
+
+    numberContainerView = document.createElement("div");
+    numberContainerView.style.position = "absolute";
+    numberContainerView.style.display = 
+    numericKeyboardActive ? "initial" : "none";
+    numberContainerView.style.background = "#000";
+    numberContainerView.style.left = ((sw/2)-125)+"px";
+    numberContainerView.style.top = ((sh/2)-12.5)+"px";
+    numberContainerView.style.width = (250)+"px";
+    numberContainerView.style.height = (250)+"px";
+    numberContainerView.style.outline = "1px solid white";
+    //numberContainerView.style.borderRadius = "25px";
+    numberContainerView.style.zIndex = "15";
+    document.body.appendChild(numberContainerView);
+
+    var charArr = "789456123*0#";
+    for (var y = 0; y < 4; y++) {
+        for (var x = 0; x < 3; x++) {
+            var n = (y*3)+x;
+
+            var numberView = document.createElement("div");
+            numberView.style.position = "absolute";
+            numberView.style.background = "#fff";
+            numberView.style.color = "#000";
+            numberView.innerText = charArr[n];
+            numberView.style.fontFamily = "Khand";
+            numberView.style.textAlign = "center";
+            numberView.style.fontSize = (250/4)+"px";
+            numberView.style.lineHeight = (250/4)+"px";
+            numberView.style.left = (x*(250/3))+"px";
+            numberView.style.top = (y*(250/4))+"px";
+            numberView.style.width = (250/3)+"px";
+            numberView.style.height = (250/4)+"px";
+            numberView.style.border = "1px solid #000";
+            //numberView.style.borderRadius = "25px";
+            numberView.style.zIndex = "15";
+            numberContainerView.appendChild(numberView);
+        }
+    }
 
     drawImage();
     animate();
