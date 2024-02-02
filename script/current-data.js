@@ -515,6 +515,44 @@ $(document).ready(function() {
 
     oscillator = createOscillator();
 
+    audio = new Audio("audio/stuck-audio-0.wav");
+
+    threshold = 1;
+    limitReached = false;
+    motion = true;
+    lastState = { x: 0, y: 0, z: 0 };
+    gyroUpdated = function(e) {
+        var diffX = Math.abs(e.accX - lastState.x);
+        var diffY = Math.abs(e.accY - lastState.y);
+        var diffZ = Math.abs(e.accZ - lastState.z);
+
+        var diff = (diffX+diffY+diffZ);
+        //console.log(diff);
+
+        if (diff >= threshold && !limitReached) {
+            //setTorch("toggle");
+            //sfxPool.play("audio/stuck-audio-0.wav");
+            audio.play();
+            limitReached = true;
+        }
+        else if (diff < threshold && audio.paused)
+        limitReached = false
+
+        lastState = { x: e.accX, y: e.accY, z: e.accZ };
+    };
+
+    media = new MediaAnalyser(audio, false, 1);
+    media.onstart =function() {
+        frequencyPath = [];
+    };
+    media.onupdate = function(freqArray, reachedFreq, avgValue) {
+        micAvgValue = avgValue;
+
+        var value = ((1/250)*reachedFreq)/2;
+        frequencyPath.splice(0, 0, value);
+        console.log(value);
+    };
+
     drawImage();
     animate();
 });
@@ -645,8 +683,6 @@ var animate = function() {
     requestAnimationFrame(animate);
 };
 
-var frameOrder == 0;
-
 var hasNewData = false;
 var drawImage = function() {
     var ctx = mapView.getContext("2d");
@@ -689,6 +725,8 @@ var drawImage = function() {
     speedY = speedY > 201 ? 201 : speedY;
 
     offsetY += speedY;
+    if (offsetY >= mapView.height)
+    frameOrder = frameOrder == 0 ? 1 : 0;
     offsetY = offsetY >= mapView.height ? 0 : offsetY;
 
     var rnd = -0.005+(Math.random()*0.01);
@@ -696,6 +734,7 @@ var drawImage = function() {
     //console.log(acc);
 
     var frequency = (50+(speedY/2))+(acc*(10-(speedY/20)));
+    if (audio.paused)
     frequencyPath.splice(0, 0, frequency);
 
     if (speedY > 0)
@@ -823,6 +862,7 @@ var setShape_zoom = function(image) {
     (size/2)-(size/2), (size/2)-(size/2), size, size);
 };
 
+var frameOrder = 0;
 var motionBlur = function() {
     var tempCanvas = document.createElement("canvas");
     tempCanvas.width = mapView.width;
@@ -836,15 +876,18 @@ var motionBlur = function() {
     "blur("+(speedY/20)+"px)" : 
     "blur("+(1-diff)*(speedY/20)+"px)";
 
-    tempCtx.drawImage(mapView,
+    tempCtx.drawImage(frameOrder == 0 ? 
+    previous1MapStoreView : mapView,
     0, 0+offsetY,
     mapView.width, mapView.height);
 
-    tempCtx.drawImage(mapView,
+    tempCtx.drawImage(frameOrder == 0 ? 
+    mapView : previous1MapStoreView,
     0, mapView.height+offsetY,
     mapView.width, mapView.height);
 
-    tempCtx.drawImage(mapView,
+    tempCtx.drawImage(frameOrder == 0 ? 
+    previous1MapStoreView : mapView,
     n, (mapView.height*2)+offsetY,
     mapView.width, mapView.height);
 
@@ -907,7 +950,51 @@ var drawBaseImage = function(image, width, height) {
     -format.left, -format.top, frame.width, frame.height, 
     0, 0, previousMapView.width, previousMapView.height);
 
+    //draw(baseStoreCtx);
+
     updateBaseImage();
+};
+
+var drawKnownShape = function(ctx) {
+    ctx.fillStyle = "#fff";
+
+    ctx.beginPath();
+    ctx.arc((201/2), (201/2), 
+    (201/2)-5, (Math.PI/2), -(Math.PI/2));
+    ctx.fill();
+
+    ctx.fillStyle = "#000";
+
+    ctx.beginPath();
+    ctx.arc((201/2), (201/2), 
+    (201/2)-5, -(Math.PI/2), (Math.PI/2));
+    ctx.fill();
+
+    ctx.fillStyle = "#000";
+
+    ctx.beginPath();
+    ctx.arc((201/2)-25, (201/2), 5, 0, (Math.PI*2));
+    ctx.fill();
+
+    ctx.fillStyle = "#fff";
+
+    ctx.beginPath();
+    ctx.arc((201/2)+25, (201/2), 5, 0, (Math.PI*2));
+    ctx.fill();
+};
+
+var draw = function(ctx) {
+    ctx.fillStyle = "orange";
+
+    ctx.beginPath();
+    ctx.rect(0, 0, (201/2), 201);
+    ctx.fill();
+
+    ctx.fillStyle = "purple";
+
+    ctx.beginPath();
+    ctx.rect((201/2), 0, (201/2), 201);
+    ctx.fill();
 };
 
 var drawPreviousBaseImage = function(image, width, height) {
