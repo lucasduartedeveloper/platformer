@@ -310,7 +310,7 @@ $(document).ready(function() {
         }
     };
 
-    previousToNext = 0.5;
+    previousToNext = 1;
     previousToNextView = document.createElement("button");
     previousToNextView.style.position = "absolute";
     previousToNextView.style.color = "#000";
@@ -806,6 +806,33 @@ var drawImage = function() {
     ctx.drawImage(tempCanvas, 0, mapView.height, 
     mapView.width, mapView.height, 
     0, 0, mapView.width, mapView.height);
+
+    var pos = { x: 85, y: 130, width: 31, height: 50 };
+
+    var tempCanvas = document.createElement("canvas");
+    tempCanvas.width = pos.width;
+    tempCanvas.height = pos.height;
+
+    var tempCtx = tempCanvas.getContext("2d");
+
+    tempCtx.drawImage(mapView, 
+    pos.x, pos.y, pos.width, pos.height,
+    0, 0, pos.width, pos.height);
+
+    ctx.fillStyle = "#000";
+
+    ctx.beginPath();
+    ctx.rect(pos.x, pos.y, pos.width, pos.height);
+    ctx.fill();
+
+    if (recordedFrequencyPath.length > 0)
+    ctx.drawImage(tempCanvas, 
+    pos.x, pos.y+
+    (recordedFrequencyPath[0]*(pos.height/2)), 
+    pos.width, pos.height);
+    else
+    ctx.drawImage(tempCanvas, 
+    pos.x, pos.y, pos.width, pos.height);
 
     var frequenctCtx = frequencyView.getContext("2d");
     frequenctCtx.clearRect(0, 0, 100, 100);
