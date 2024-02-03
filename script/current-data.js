@@ -515,8 +515,6 @@ $(document).ready(function() {
 
     oscillator = createOscillator();
 
-    audio = new Audio("audio/stuck-audio-0.wav");
-
     threshold = 1;
     limitReached = false;
     motion = false;
@@ -540,6 +538,8 @@ $(document).ready(function() {
 
         lastState = { x: e.accX, y: e.accY, z: e.accZ };
     };
+
+    audio = new Audio("audio/stuck-audio-0.wav");
 
     recordedFrequencyPath = [];
     recordedFrequencyView = document.createElement("canvas");
@@ -575,6 +575,8 @@ $(document).ready(function() {
 
     recordedTextView.onclick = function() {
         if (!navigator.getUserMedia) {
+            audio = new Audio("audio/stuck-audio-0.wav");
+            media.setAudio(audio);
             audio.play();
             return;
         }
@@ -635,9 +637,33 @@ $(document).ready(function() {
 
     numericKeyboardView.onclick = function() {
         numericKeyboardActive = !numericKeyboardActive;
+
         numberContainerView.style.display = 
         numericKeyboardActive ? "initial" : "none";
+
+        numericDisplayView.style.display = 
+        numericKeyboardActive ? "initial" : "none";
     };
+
+    var numberDisplay = "";
+    numericDisplayView = document.createElement("span");
+    numericDisplayView.style.position = "absolute";
+    numericDisplayView.style.display = 
+    numericKeyboardActive ? "initial" : "none";
+    numericDisplayView.style.color = "#fff";
+    numericDisplayView.innerText = numberDisplay;
+    numericDisplayView.style.fontFamily = "Khand";
+    numericDisplayView.style.fontSize = "25px";
+    numericDisplayView.style.lineHeight = "25px";
+    numericDisplayView.style.textAlign = "right";
+    numericDisplayView.style.left = ((sw/2)+(201/2)-50)+"px";
+    numericDisplayView.style.top = ((sh/2)-50)+"px";
+    numericDisplayView.style.width = (50)+"px";
+    numericDisplayView.style.height = (25)+"px";
+    numericDisplayView.style.border = "none";
+    numericDisplayView.style.borderRadius = "12.5px";
+    numericDisplayView.style.zIndex = "15";
+    document.body.appendChild(numericDisplayView);
 
     numberContainerView = document.createElement("div");
     numberContainerView.style.position = "absolute";
@@ -654,6 +680,20 @@ $(document).ready(function() {
     document.body.appendChild(numberContainerView);
 
     var charArr = "789456123*0#";
+    var audioArr = [
+        "audio/stuck-audio_7-digit.wav",
+        "audio/stuck-audio_8-digit.wav",
+        "audio/stuck-audio_9-digit.wav",
+        "audio/stuck-audio_4-digit.wav",
+        "audio/stuck-audio_5-digit.wav",
+        "audio/stuck-audio_6-digit.wav",
+        "audio/stuck-audio_1-digit.wav",
+        "audio/stuck-audio_2-digit.wav",
+        "audio/stuck-audio_3-digit.wav",
+        "audio/stuck-audio_*-digit.wav",
+        "audio/stuck-audio_0-digit.wav",
+        "audio/stuck-audio_#-digit.wav"
+    ];
     for (var y = 0; y < 4; y++) {
         for (var x = 0; x < 3; x++) {
             var n = (y*3)+x;
@@ -665,7 +705,7 @@ $(document).ready(function() {
             numberView.innerText = charArr[n];
             numberView.style.fontFamily = "Khand";
             numberView.style.textAlign = "center";
-            numberView.style.fontSize = (250/4)+"px";
+            numberView.style.fontSize = (250/8)+"px";
             numberView.style.lineHeight = (250/4)+"px";
             numberView.style.left = (x*(250/3))+"px";
             numberView.style.top = (y*(250/4))+"px";
@@ -675,6 +715,20 @@ $(document).ready(function() {
             //numberView.style.borderRadius = "25px";
             numberView.style.zIndex = "15";
             numberContainerView.appendChild(numberView);
+
+            numberView.no = n;
+
+            numberView.onclick = function() {
+                audio = new Audio(audioArr[this.no]);
+                media.setAudio(audio);
+                audio.play();
+
+                if (charArr[this.no] == "*")
+                numberDisplay = "";
+                else
+                numberDisplay += charArr[this.no];
+                numericDisplayView.innerText = numberDisplay;
+            };
         }
     }
 

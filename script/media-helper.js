@@ -57,6 +57,8 @@ class MediaAnalyser {
         // configuration
         this.audioContent = new AudioContext();
 
+        console.log(stream.getAudioTracks());
+
         // configuration
         this.audioStream = 
         this.audioContent.createMediaStreamSource(stream);
