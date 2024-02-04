@@ -47,7 +47,7 @@ $(document).ready(function() {
     };
 
     tileSize = (sw/7);
-    
+
     mapStoreView = document.createElement("canvas");
     mapStoreView.style.position = "absolute";
     mapStoreView.style.imageRendering = "pixelated";
@@ -114,8 +114,11 @@ $(document).ready(function() {
         position.x = e.touches[0].clientX;
         position.y = e.touches[0].clientY;
 
-        position.x = (position.x - (position.x % 25));
-        position.y = (position.y - (position.y % 25));
+        var valueX = Math.round(position.x / 25);
+        var valueY = Math.round(position.y / 25);
+
+        position.x = (valueX * 25);
+        position.y = (valueY * 25);
 
         tileView.style.left = (position.x-(sw/10))+"px";
         tileView.style.top = (position.y-(sw/10))+"px";
@@ -125,8 +128,11 @@ $(document).ready(function() {
         position.x = e.touches[0].clientX;
         position.y = e.touches[0].clientY;
 
-        position.x = (position.x - (position.x % 25));
-        position.y = (position.y - (position.y % 25));
+        var valueX = Math.round(position.x / 25);
+        var valueY = Math.round(position.y / 25);
+
+        position.x = (valueX * 25);
+        position.y = (valueY * 25);
 
         tileView.style.left = (position.x-(sw/10))+"px";
         tileView.style.top = (position.y-(sw/10))+"px";
@@ -198,7 +204,7 @@ var loadImages = function(callback) {
     }
 };
 
-document.addEventListener('keydown', (e) => {
+document.addEventListener("keydown", (e) => {
     const keyName = e.key;
     switch (e.keyCode) {
         case 37:
@@ -311,11 +317,14 @@ var drawImage = function() {
 
     mapCtx.drawImage(mapStoreView, 0, 0, sw, sh);
 
+    var lineCount = (Math.floor((sh/25))+1);
+    var columnCount = (Math.floor((sw/25))+1);
+
     mapCtx.fillStyle = "#000";
-    for (var y = 0; y < (Math.floor((sh/25))+1); y++) {
-    for (var x = 0; x < (Math.floor((sw/25))+1); x++) {
+    for (var y = -(lineCount/2); y < (lineCount/2); y++) {
+    for (var x = -(lineCount/2); x < (lineCount/2); x++) {
         mapCtx.beginPath();
-        mapCtx.arc(x*25, y*25, 2.5, 0, (Math.PI*2));
+        mapCtx.arc((sw/2)+(x*25), (sh/2)+(y*25), 2.5, 0, (Math.PI*2));
         mapCtx.fill();
     }
     }
