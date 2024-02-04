@@ -53,7 +53,7 @@ $(document).ready(function() {
     var columnCount = (Math.floor((sw/25))+1);
 
     for (var y = -(lineCount/2); y < (lineCount/2); y++) {
-    for (var x = -(lineCount/2); x < (lineCount/2); x++) {
+    for (var x = -(columnCount/2); x < (columnCount/2); x++) {
         var obj = { x: (sw/2)+(x*25), y: (sh/2)+(y*25) };
         positionArr.push(obj);
     }
