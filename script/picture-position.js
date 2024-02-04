@@ -138,8 +138,8 @@ $(document).ready(function() {
             }
         }
 
-        position.x = positionArr[k].x;
-        position.y = positionArr[k].y;
+        position.x = positionArr[k].x+(25/2);
+        position.y = positionArr[k].y+(25/2);
 
         tileView.style.left = (position.x-(sw/10))+"px";
         tileView.style.top = (position.y-(sw/10))+"px";
@@ -162,8 +162,8 @@ $(document).ready(function() {
             }
         }
 
-        position.x = positionArr[k].x;
-        position.y = positionArr[k].y;
+        position.x = positionArr[k].x+(25/2);
+        position.y = positionArr[k].y+(25/2);
 
         tileView.style.left = (position.x-(sw/10))+"px";
         tileView.style.top = (position.y-(sw/10))+"px";
