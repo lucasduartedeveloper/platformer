@@ -36,27 +36,29 @@ function startCamera(color=true) {
           } }, 
           audio: false })
           .then((stream) => {
-               console.log("camera started");
-               cameraOn = true;
+                console.log("camera started");
+                cameraOn = true;
 
-               var track = stream.getVideoTracks()[0];
-               var display = track.getSettings();
+                var track = stream.getVideoTracks()[0];
+                var display = track.getSettings();
 
-               console.log(display);
-               vw = display.width;
-               vh = display.height;
+                console.log(display);
+                vw = display.width;
+                vh = display.height;
 
-               var capabilities = track.getCapabilities();
-               console.log(capabilities);
+                var capabilities = track.getCapabilities();
+                console.log(capabilities);
 
-               focusMin = capabilities.zoom.min;
-               focusMax = capabilities.zoom.max;
-               focusStep = capabilities.zoom.step;
-               focusDistance = display.zoom;
+                if (capabilities.zoom) {
+                    focusMin = capabilities.zoom.min;
+                    focusMax = capabilities.zoom.max;
+                    focusStep = capabilities.zoom.step;
+                    focusDistance = display.zoom;
+                }
 
-               cameraElem.srcObject = stream;
-               cameraElem.width = vw;
-               cameraElem.height = vh;
+                cameraElem.srcObject = stream;
+                cameraElem.width = vw;
+                cameraElem.height = vh;
           });
     }
 }

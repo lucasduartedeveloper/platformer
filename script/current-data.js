@@ -737,7 +737,7 @@ $(document).ready(function() {
 });
 
 var img_list = [
-    "img/picture-3.png",
+    "img/picture-0.png",
     "img/picture-2.png"
 ];
 

@@ -47,6 +47,23 @@ $(document).ready(function() {
     };
 
     tileSize = (sw/7);
+    
+    mapStoreView = document.createElement("canvas");
+    mapStoreView.style.position = "absolute";
+    mapStoreView.style.imageRendering = "pixelated";
+    mapStoreView.style.background = "#fff";
+    mapStoreView.style.fontFamily = "Khand";
+    mapStoreView.style.fontSize = "15px";
+    mapStoreView.style.textAlign = "center";
+    mapStoreView.width = (sw);
+    mapStoreView.height = (sh);
+    mapStoreView.style.left = (0)+"px";
+    mapStoreView.style.top = (0)+"px";
+    mapStoreView.style.width = (sw)+"px";
+    mapStoreView.style.height = (sh)+"px";
+    //mapView.style.borderRadius = "25px";
+    mapStoreView.style.zIndex = "15";
+    document.body.appendChild(mapStoreView);
 
     hasNewData = false;
     mapView = document.createElement("canvas");
@@ -83,7 +100,7 @@ $(document).ready(function() {
     tileView.style.fontSize = "15px";
     tileView.style.textAlign = "center";
     tileView.width = (sw/5);
-    tileView.height = (sw/5)
+    tileView.height = (sw/5);
     tileView.style.left = (position.x-(sw/10))+"px";
     tileView.style.top = (position.y-(sw/10))+"px";
     tileView.style.width = (sw/5)+"px";
@@ -97,6 +114,9 @@ $(document).ready(function() {
         position.x = e.touches[0].clientX;
         position.y = e.touches[0].clientY;
 
+        position.x = (position.x - (position.x % 25));
+        position.y = (position.y - (position.y % 25));
+
         tileView.style.left = (position.x-(sw/10))+"px";
         tileView.style.top = (position.y-(sw/10))+"px";
     };
@@ -105,11 +125,14 @@ $(document).ready(function() {
         position.x = e.touches[0].clientX;
         position.y = e.touches[0].clientY;
 
+        position.x = (position.x - (position.x % 25));
+        position.y = (position.y - (position.y % 25));
+
         tileView.style.left = (position.x-(sw/10))+"px";
         tileView.style.top = (position.y-(sw/10))+"px";
     };
 
-    invertImage = false;
+    invertImage = (sw > sh);
     cameraView = document.createElement("video");
     cameraView.style.position = "absolute";
     cameraView.autoplay = true;
@@ -130,9 +153,23 @@ $(document).ready(function() {
         else hasNewData = true;
     };
 
+    motion = true;
+    gyroUpdated = function(e) {
+        var co = Math.abs(e.accY);
+        var ca = Math.abs(e.accZ);
+        var value = Math.round((_angle2d(co, -ca)*(180/Math.PI)/5));
+        angle = value*5;
+
+        var hyp = Math.sqrt(
+        Math.pow(co, 2)+
+        Math.pow(ca, 2));
+    };
+
     drawImage();
     animate();
 });
+
+var angle = 0;
 
 var img_list = [
     "img/picture-3.png",
@@ -261,13 +298,32 @@ var animate = function() {
 };
 
 var drawImage = function() {
+    var mapCtx = mapView.getContext("2d");
+    var mapStoreCtx = mapStoreView.getContext("2d");
+
     var ctx = tileView.getContext("2d");
     ctx.imageSmoothingEnabled = false;
+
+    mapCtx.clearRect(0, 0, sw, sh);
+
+    mapCtx.fillStyle = "#fff";
+    mapCtx.fillRect(0, 0, sw, sh);
+
+    mapCtx.drawImage(mapStoreView, 0, 0, sw, sh);
+
+    mapCtx.fillStyle = "#000";
+    for (var y = 0; y < (Math.floor((sh/25))+1); y++) {
+    for (var x = 0; x < (Math.floor((sw/25))+1); x++) {
+        mapCtx.beginPath();
+        mapCtx.arc(x*25, y*25, 2.5, 0, (Math.PI*2));
+        mapCtx.fill();
+    }
+    }
 
     ctx.save();
     if (invertImage) {
         ctx.scale(-1, 1);
-        ctx.translate(-201, 0);
+        ctx.translate(-(sw/5), 0);
     }
 
     if (cameraOn) {
@@ -287,16 +343,33 @@ var drawImage = function() {
     }
 
     if (hasNewData) {
-        var mapCtx = mapView.getContext("2d");
-
-        mapCtx.drawImage(tileView,
+        mapStoreCtx.drawImage(tileView,
         position.x-(sw/10), position.y-(sw/10), (sw/5), (sw/5));
 
         hasNewData= false;
     }
 
     ctx.restore();
-};
+
+    if (!cameraOn) {
+        ctx.clearRect(0, 0, (sw/5), (sw/5));
+
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, (sw/5), (sw/5));
+
+        if (angle == 0 || angle == 45 ||  angle == 90) 
+        ctx.fillStyle = "#5f5";
+        else if (angle == 5 || angle == 40 || angle == 50 || angle == 85) 
+        ctx.fillStyle = "#ff5";
+        else
+        ctx.fillStyle = "#f55";
+
+        ctx.font = ((sw/5)/2)+"px sans serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(angle+"°", ((sw/5)/2), ((sw/5)/2));
+    }
+}
 
 var rotation = 0;
 var setShape = function(image) {
