@@ -48,6 +48,17 @@ $(document).ready(function() {
 
     tileSize = (sw/7);
 
+    positionArr = [];
+    var lineCount = (Math.floor((sh/25))+1);
+    var columnCount = (Math.floor((sw/25))+1);
+
+    for (var y = -(lineCount/2); y < (lineCount/2); y++) {
+    for (var x = -(lineCount/2); x < (lineCount/2); x++) {
+        var obj = { x: (sw/2)+(x*25), y: (sh/2)+(y*25) };
+        positionArr.push(obj);
+    }
+    }
+
     mapStoreView = document.createElement("canvas");
     mapStoreView.style.position = "absolute";
     mapStoreView.style.imageRendering = "pixelated";
@@ -114,11 +125,21 @@ $(document).ready(function() {
         position.x = e.touches[0].clientX;
         position.y = e.touches[0].clientY;
 
-        var valueX = Math.round(position.x / 25);
-        var valueY = Math.round(position.y / 25);
+        var diffX = sw;
+        var diffY = sh;
+        var k = 0;
+        for (var n = 0; n < positionArr.length; n++) {
+            if ((Math.abs(position.x - positionArr[n].x)+
+            Math.abs(position.y - positionArr[n].y)) <
+            (diffX + diffY)) {
+                k = n;
+                diffX = Math.abs(position.x - positionArr[n].x);
+                diffY = Math.abs(position.y - positionArr[n].y);
+            }
+        }
 
-        position.x = (valueX * 25);
-        position.y = (valueY * 25);
+        position.x = positionArr[k].x;
+        position.y = positionArr[k].y;
 
         tileView.style.left = (position.x-(sw/10))+"px";
         tileView.style.top = (position.y-(sw/10))+"px";
@@ -128,11 +149,21 @@ $(document).ready(function() {
         position.x = e.touches[0].clientX;
         position.y = e.touches[0].clientY;
 
-        var valueX = Math.round(position.x / 25);
-        var valueY = Math.round(position.y / 25);
+        var diffX = sw;
+        var diffY = sh;
+        var k = 0;
+        for (var n = 0; n < positionArr.length; n++) {
+            if ((Math.abs(position.x - positionArr[n].x)+
+            Math.abs(position.y - positionArr[n].y)) <
+            (diffX + diffY)) {
+                k = n;
+                diffX = Math.abs(position.x - positionArr[n].x);
+                diffY = Math.abs(position.y - positionArr[n].y);
+            }
+        }
 
-        position.x = (valueX * 25);
-        position.y = (valueY * 25);
+        position.x = positionArr[k].x;
+        position.y = positionArr[k].y;
 
         tileView.style.left = (position.x-(sw/10))+"px";
         tileView.style.top = (position.y-(sw/10))+"px";
@@ -321,12 +352,10 @@ var drawImage = function() {
     var columnCount = (Math.floor((sw/25))+1);
 
     mapCtx.fillStyle = "#000";
-    for (var y = -(lineCount/2); y < (lineCount/2); y++) {
-    for (var x = -(lineCount/2); x < (lineCount/2); x++) {
+    for (var n = 0; n < positionArr.length; n++) {
         mapCtx.beginPath();
-        mapCtx.arc((sw/2)+(x*25), (sh/2)+(y*25), 2.5, 0, (Math.PI*2));
+        mapCtx.arc(positionArr[n].x, positionArr[n].y, 2.5, 0, (Math.PI*2));
         mapCtx.fill();
-    }
     }
 
     ctx.save();
